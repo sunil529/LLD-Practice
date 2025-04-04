@@ -1,0 +1,3 @@
+pubilc Interface ILogger{
+    void log(LogMessage logMessage);
+}

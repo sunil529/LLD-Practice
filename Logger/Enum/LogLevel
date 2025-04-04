@@ -1,0 +1,3 @@
+public ENUM LogLevel{
+    INFO, DEBUG, WARN, ERROR, FATAL
+}

@@ -1,0 +1,15 @@
+✅ IS-A Relationships:
+
+Admin IS-A User (Admin is a special type of User with more privileges)
+
+✅ HAS-A Relationships:
+
+User HAS-A Ticket
+
+Theater HAS-A Screen
+
+Screen HAS-A Seat
+
+Show HAS-A Movie
+
+Ticket HAS-A Payment

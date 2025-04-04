@@ -1,0 +1,28 @@
+Problem Statement:
+Design a URL shortening service similar to bit.ly or tinyurl.com that allows users to shorten long URLs into a unique, fixed-length identifier and track analytics for each shortened URL.
+
+1️⃣ Functional Requirements (FRs)
+✅ Shorten URL: Users should be able to input a long URL and receive a shortened version.
+✅ Redirect URL: When users access the shortened URL, they should be redirected to the original long URL.
+✅ Custom Short URL: Users can optionally provide a custom alias instead of a randomly generated one.
+✅ Analytics Tracking: Track the number of times a shortened URL is accessed, along with location, device type, and timestamp.
+✅ Expiration Mechanism: Allow users to set an expiration date for shortened URLs.
+✅ User Authentication & Management: Logged-in users should be able to manage (edit, delete, or extend) their URLs.
+✅ Bulk URL Shortening: Users should be able to shorten multiple URLs at once.
+✅ Preview Feature: Before redirecting, users can preview the destination URL.
+
+2️⃣ Non-Functional Requirements (NFRs)
+🚀 High Availability: The service should be available 24/7 with minimal downtime.
+⚡ Low Latency: URL shortening and redirection should happen in milliseconds.
+📈 Scalability: Support millions/billions of URL shortenings and redirections.
+🔒 Security:
+
+Prevent malicious URLs (phishing, malware).
+
+Secure against brute-force guessing of URLs.
+
+Implement rate-limiting to prevent abuse.
+📊 Data Persistence: Store URLs reliably and ensure backups.
+🔄 Consistency: Ensure that once a URL is shortened, it remains accessible.
+🛠 Fault Tolerance: The system should be resilient against failures.
+

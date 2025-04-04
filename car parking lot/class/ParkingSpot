@@ -1,0 +1,7 @@
+public class ParkingSpot
+{
+    public int SpotID { get; set; }
+    public string SpotNumber { get; set; }
+    public string SpotType { get; set; }
+    public bool IsOccupied { get; set; } = false;
+}

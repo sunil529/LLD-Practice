@@ -1,0 +1,26 @@
+// Service: BookingService
+public class BookingService
+{
+    public Booking CreateBooking(User user, Show show, List<Seat> selectedSeats)
+    {
+        if (selectedSeats.Exists(seat => !seat.IsAvailable))
+        {
+            throw new Exception("One or more selected seats are not available.");
+        }
+
+        Booking booking = new Booking
+        {
+            BookingId = new Random().Next(1000, 9999),
+            User = user,
+            Show = show,
+            Seats = selectedSeats,
+            TotalPrice = show.PricePerSeat * selectedSeats.Count,
+            PaymentStatus = "Pending"
+        };
+
+        // Mark seats as unavailable
+        selectedSeats.ForEach(seat => seat.IsAvailable = false);
+
+        return booking;
+    }
+}

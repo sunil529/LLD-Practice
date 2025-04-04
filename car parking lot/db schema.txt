@@ -1,0 +1,104 @@
+Schema Relationship Summary
+One ParkingLot → Many ParkingFloors
+
+One ParkingFloor → Many ParkingSpots
+
+One ParkingSpot → One Vehicle (At a time)
+
+One EntryGate/ExitGate → One ParkingAttendant
+
+One Ticket → One Vehicle & One ParkingSpot
+
+One Ticket → One Payment
+
+One Payment → Multiple Payment Methods
+
+
+Parking lot table
+CREATE TABLE ParkingLot (
+    ParkingLotID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Location VARCHAR(255) NOT NULL,
+    TotalFloors INT NOT NULL,
+    TotalSpots INT NOT NULL
+);
+
+parking floor table
+CREATE TABLE ParkingFloor (
+    FloorID INT PRIMARY KEY AUTO_INCREMENT,
+    ParkingLotID INT NOT NULL,
+    FloorNumber INT NOT NULL,
+    TotalSpots INT NOT NULL,
+    FOREIGN KEY (ParkingLotID) REFERENCES ParkingLot(ParkingLotID) ON DELETE CASCADE
+);
+
+parking spot table
+CREATE TABLE ParkingSpot (
+    SpotID INT PRIMARY KEY AUTO_INCREMENT,
+    FloorID INT NOT NULL,
+    SpotNumber VARCHAR(50) NOT NULL UNIQUE,
+    SpotType ENUM('Compact', 'Large', 'Handicapped', 'Motorcycle') NOT NULL,
+    IsOccupied BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (FloorID) REFERENCES ParkingFloor(FloorID) ON DELETE CASCADE
+);
+
+vehicle table
+CREATE TABLE Vehicle (
+    VehicleID INT PRIMARY KEY AUTO_INCREMENT,
+    LicensePlate VARCHAR(20) NOT NULL UNIQUE,
+    VehicleType ENUM('Car', 'Bike', 'Truck') NOT NULL,
+    OwnerName VARCHAR(255) NOT NULL
+);
+
+entrygate table
+CREATE TABLE EntryGate (
+    EntryGateID INT PRIMARY KEY AUTO_INCREMENT,
+    GateNumber VARCHAR(50) NOT NULL UNIQUE
+);
+
+exit gate table
+CREATE TABLE ExitGate (
+    ExitGateID INT PRIMARY KEY AUTO_INCREMENT,
+    GateNumber VARCHAR(50) NOT NULL UNIQUE
+);
+
+parking attendant table
+CREATE TABLE ParkingAttendant (
+    AttendantID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    UserAccountID INT NOT NULL UNIQUE,
+    FOREIGN KEY (UserAccountID) REFERENCES UserAccount(UserAccountID) ON DELETE CASCADE
+);
+
+Useraccount table
+CREATE TABLE UserAccount (
+    UserAccountID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL
+);
+
+ticket table
+CREATE TABLE Ticket (
+    TicketID INT PRIMARY KEY AUTO_INCREMENT,
+    SpotID INT NOT NULL,
+    VehicleID INT NOT NULL,
+    EntryTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ExitTime DATETIME NULL,
+    Status ENUM('Active', 'Paid', 'Lost') DEFAULT 'Active',
+    FOREIGN KEY (SpotID) REFERENCES ParkingSpot(SpotID) ON DELETE CASCADE,
+    FOREIGN KEY (VehicleID) REFERENCES Vehicle(VehicleID) ON DELETE CASCADE
+);
+
+payment table
+CREATE TABLE Payment (
+    PaymentID INT PRIMARY KEY AUTO_INCREMENT,
+    TicketID INT NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+    PaymentStatus ENUM('Pending', 'Completed', 'Failed') DEFAULT 'Pending',
+    PaymentMethod ENUM('Cash', 'Card', 'UPI') NOT NULL,
+    PaymentTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (TicketID) REFERENCES Ticket(TicketID) ON DELETE CASCADE
+);
+
+
+

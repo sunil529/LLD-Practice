@@ -1,0 +1,58 @@
+/ Board class with random Snakes and Ladders
+public class Board
+{
+    private readonly Dictionary<int, int> snakes = new Dictionary<int, int>();
+    private readonly Dictionary<int, int> ladders = new Dictionary<int, int>();
+    private const int boardSize = 100;
+    private Random random = new Random();
+
+    public Board()
+    {
+        GenerateSnakesAndLadders();
+    }
+
+    private void GenerateSnakesAndLadders()
+    {
+        // Randomly place 5 snakes and 5 ladders
+        for (int i = 0; i < 5; i++)
+        {
+            int start, end;
+            do
+            {
+                start = random.Next(20, boardSize);
+                end = random.Next(1, start - 1);
+            } while (snakes.ContainsKey(start) || ladders.ContainsKey(start));
+            
+            snakes[start] = end;
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            int start, end;
+            do
+            {
+                start = random.Next(1, boardSize - 10);
+                end = random.Next(start + 1, boardSize);
+            } while (ladders.ContainsKey(start) || snakes.ContainsKey(start));
+            
+            ladders[start] = end;
+        }
+    }
+
+    public int MovePlayer(int position)
+    {
+        if (snakes.ContainsKey(position))
+        {
+            Console.WriteLine($"Oops! Snake at {position} moves you down to {snakes[position]}");
+            return snakes[position];
+        }
+        if (ladders.ContainsKey(position))
+        {
+            Console.WriteLine($"Great! Ladder at {position} moves you up to {ladders[position]}");
+            return ladders[position];
+        }
+        return position;
+    }
+
+    public bool HasWon(int position) => position >= boardSize;
+}

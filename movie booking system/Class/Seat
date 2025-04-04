@@ -1,0 +1,8 @@
+// Entity: Seat
+public class Seat
+{
+    public int SeatId { get; set; }
+    public string SeatNumber { get; set; }
+    public string SeatType { get; set; } // Regular, Premium, VIP
+    public bool IsAvailable { get; set; } = true;
+}

@@ -1,0 +1,41 @@
+CREATE TABLE Building (
+    BuildingID INT PRIMARY KEY,
+    Name VARCHAR(255),
+    TotalFloors INT,
+    TotalElevators INT
+);
+
+CREATE TABLE Elevator (
+    ElevatorID INT PRIMARY KEY,
+    BuildingID INT,
+    CurrentFloor INT,
+    Status ENUM('Idle', 'Moving', 'Maintenance'),
+    Direction ENUM('Up', 'Down', 'None'),
+    Capacity INT,
+    Speed FLOAT,
+    FOREIGN KEY (BuildingID) REFERENCES Building(BuildingID)
+);
+
+CREATE TABLE Floor (
+    FloorID INT PRIMARY KEY,
+    BuildingID INT,
+    FloorNumber INT,
+    UpButton BOOLEAN,
+    DownButton BOOLEAN,
+    FOREIGN KEY (BuildingID) REFERENCES Building(BuildingID)
+);
+
+CREATE TABLE UserRequest (
+    RequestID INT PRIMARY KEY,
+    SourceFloor INT,
+    DestinationFloor INT,
+    Direction ENUM('Up', 'Down'),
+    Status ENUM('Pending', 'Completed')
+);
+
+CREATE TABLE ElevatorRequest (
+    RequestID INT PRIMARY KEY,
+    ElevatorID INT,
+    TargetFloor INT,
+    FOREIGN KEY (ElevatorID) REFERENCES Elevator(ElevatorID)
+);

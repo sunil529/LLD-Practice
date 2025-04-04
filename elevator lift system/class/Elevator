@@ -1,0 +1,37 @@
+public class Elevator : Machine
+{
+    public int ElevatorId { get; set; }
+    public int CurrentFloor { get; set; } = 0;
+    public ElevatorStatus Status { get; set; } = ElevatorStatus.Idle;
+    public Queue<int> Requests { get; set; } = new Queue<int>();
+
+    public void RequestFloor(int floor)
+    {
+        Requests.Enqueue(floor);
+    }
+
+    public void Move()
+    {
+        while (Requests.Count > 0)
+        {
+            int targetFloor = Requests.Dequeue();
+            if (targetFloor > CurrentFloor)
+            {
+                Status = ElevatorStatus.MovingUp;
+                Console.WriteLine($"Elevator {ElevatorId} moving up to floor {targetFloor}");
+            }
+            else if (targetFloor < CurrentFloor)
+            {
+                Status = ElevatorStatus.MovingDown;
+                Console.WriteLine($"Elevator {ElevatorId} moving down to floor {targetFloor}");
+            }
+            else
+            {
+                Status = ElevatorStatus.Idle;
+            }
+            CurrentFloor = targetFloor;
+            Console.WriteLine($"Elevator {ElevatorId} arrived at floor {CurrentFloor}");
+            Status = ElevatorStatus.Idle;
+        }
+    }
+}

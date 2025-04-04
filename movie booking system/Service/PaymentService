@@ -1,0 +1,9 @@
+// Service: PaymentService
+public class PaymentService
+{
+    public void ProcessPayment(Booking booking, string paymentMode)
+    {
+        booking.PaymentStatus = "Completed";
+        Console.WriteLine($"Payment of {booking.TotalPrice} using {paymentMode} successful for booking {booking.BookingId}.");
+    }
+}

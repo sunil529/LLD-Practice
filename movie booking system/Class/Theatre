@@ -1,0 +1,8 @@
+// Entity: Theater
+public class Theater
+{
+    public int TheaterId { get; set; }
+    public string Name { get; set; }
+    public string Location { get; set; }
+    public List<Screen> Screens { get; set; } = new List<Screen>();
+}

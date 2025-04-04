@@ -1,0 +1,152 @@
+User (Represents a customer using the system)
+UserId (int, Primary Key)
+
+Name (string)
+
+Email (string, unique)
+
+PhoneNumber (string, unique)
+
+Password (string)
+
+BookingHistory (List<Booking>) (Has-a relationship with Booking)
+
+2. Movie (Represents a movie available for booking)
+MovieId (int, Primary Key)
+
+Title (string)
+
+Genre (string)
+
+Duration (int, in minutes)
+
+Language (string)
+
+ReleaseDate (DateTime)
+
+Rating (float)
+
+ShowList (List<Show>) (Has-a relationship with Show)
+
+3. Theater (Represents a cinema hall with multiple screens)
+TheaterId (int, Primary Key)
+
+Name (string)
+
+Location (string)
+
+Screens (List<Screen>) (Has-a relationship with Screen)
+
+4. Screen (Represents a screen in a theater that plays movies)
+ScreenId (int, Primary Key)
+
+TheaterId (int, Foreign Key)
+
+ScreenNumber (int)
+
+Capacity (int)
+
+Shows (List<Show>) (Has-a relationship with Show)
+
+5. Show (Represents a specific movie show in a screen at a given time)
+ShowId (int, Primary Key)
+
+MovieId (int, Foreign Key)
+
+ScreenId (int, Foreign Key)
+
+StartTime (DateTime)
+
+EndTime (DateTime)
+
+AvailableSeats (int)
+
+PricePerSeat (decimal)
+
+6. Booking (Represents a ticket booking made by a user)
+BookingId (int, Primary Key)
+
+UserId (int, Foreign Key)
+
+ShowId (int, Foreign Key)
+
+BookedSeats (List<Seat>) (Has-a relationship with Seat)
+
+TotalPrice (decimal)
+
+PaymentStatus (enum: Pending, Completed, Failed)
+
+BookingTime (DateTime)
+
+7. Seat (Represents a seat in a screen)
+SeatId (int, Primary Key)
+
+ScreenId (int, Foreign Key)
+
+SeatNumber (string)
+
+SeatType (enum: Regular, Premium, VIP)
+
+IsAvailable (bool)
+
+8. Payment (Represents a payment transaction for a booking)
+PaymentId (int, Primary Key)
+
+BookingId (int, Foreign Key)
+
+UserId (int, Foreign Key)
+
+Amount (decimal)
+
+PaymentMode (enum: CreditCard, DebitCard, UPI, NetBanking, Wallet)
+
+PaymentStatus (enum: Pending, Success, Failed)
+
+TransactionId (string, unique)
+
+PaymentTime (DateTime)
+
+9. Discount (Represents discounts or offers applied to bookings)
+DiscountId (int, Primary Key)
+
+Code (string, unique)
+
+DiscountPercentage (float)
+
+Validity (DateTime)
+
+ApplicableMovies (List<Movie>) (Has-a relationship with Movie)
+
+10. Review (Represents user reviews for movies)
+ReviewId (int, Primary Key)
+
+UserId (int, Foreign Key)
+
+MovieId (int, Foreign Key)
+
+Rating (float)
+
+Comment (string)
+
+ReviewDate (DateTime)
+
+Entity Relationships
+User has-a Booking
+
+User has-a Payment
+
+User has-a Review
+
+Theater has-a Screen
+
+Screen has-a Show
+
+Show has-a Movie
+
+Show has-a Booking
+
+Booking has-a Seat
+
+Booking has-a Payment
+
+Discount has-a Movie

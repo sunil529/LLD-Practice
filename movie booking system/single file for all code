@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+
+// Entity: User
+public class User
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string PhoneNumber { get; set; }
+}
+
+// Entity: Movie
+public class Movie
+{
+    public int MovieId { get; set; }
+    public string Title { get; set; }
+    public string Genre { get; set; }
+    public int Duration { get; set; } // in minutes
+    public string Language { get; set; }
+    public DateTime ReleaseDate { get; set; }
+    public float Rating { get; set; } // 0-10
+}
+
+// Entity: Theater
+public class Theater
+{
+    public int TheaterId { get; set; }
+    public string Name { get; set; }
+    public string Location { get; set; }
+    public List<Screen> Screens { get; set; } = new List<Screen>();
+}
+
+// Entity: Screen
+public class Screen
+{
+    public int ScreenId { get; set; }
+    public int ScreenNumber { get; set; }
+    public int Capacity { get; set; }
+    public List<Seat> Seats { get; set; } = new List<Seat>();
+}
+
+// Entity: Seat
+public class Seat
+{
+    public int SeatId { get; set; }
+    public string SeatNumber { get; set; }
+    public string SeatType { get; set; } // Regular, Premium, VIP
+    public bool IsAvailable { get; set; } = true;
+}
+
+// Entity: Show
+public class Show
+{
+    public int ShowId { get; set; }
+    public Movie Movie { get; set; }
+    public Screen Screen { get; set; }
+    public DateTime StartTime { get; set; }
+    public decimal PricePerSeat { get; set; }
+}
+
+// Entity: Booking
+public class Booking
+{
+    public int BookingId { get; set; }
+    public User User { get; set; }
+    public Show Show { get; set; }
+    public List<Seat> Seats { get; set; } = new List<Seat>();
+    public decimal TotalPrice { get; set; }
+    public string PaymentStatus { get; set; } // Pending, Completed, Failed
+}
+
+// Entity: Payment
+public class Payment
+{
+    public int PaymentId { get; set; }
+    public Booking Booking { get; set; }
+    public decimal Amount { get; set; }
+    public string PaymentMode { get; set; } // CreditCard, DebitCard, UPI, etc.
+    public string PaymentStatus { get; set; } // Pending, Success, Failed
+}
+
+// Service: BookingService
+public class BookingService
+{
+    public Booking CreateBooking(User user, Show show, List<Seat> selectedSeats)
+    {
+        if (selectedSeats.Exists(seat => !seat.IsAvailable))
+        {
+            throw new Exception("One or more selected seats are not available.");
+        }
+
+        Booking booking = new Booking
+        {
+            BookingId = new Random().Next(1000, 9999),
+            User = user,
+            Show = show,
+            Seats = selectedSeats,
+            TotalPrice = show.PricePerSeat * selectedSeats.Count,
+            PaymentStatus = "Pending"
+        };
+
+        // Mark seats as unavailable
+        selectedSeats.ForEach(seat => seat.IsAvailable = false);
+
+        return booking;
+    }
+}
+
+// Service: PaymentService
+public class PaymentService
+{
+    public void ProcessPayment(Booking booking, string paymentMode)
+    {
+        booking.PaymentStatus = "Completed";
+        Console.WriteLine($"Payment of {booking.TotalPrice} using {paymentMode} successful for booking {booking.BookingId}.");
+    }
+}
+
+// Main Program
+class Program
+{
+    static void Main()
+    {
+        User user = new User { UserId = 1, Name = "John Doe", Email = "john@example.com", PhoneNumber = "1234567890" };
+        Movie movie = new Movie { MovieId = 101, Title = "Avengers: Endgame", Genre = "Action", Duration = 180, Language = "English", ReleaseDate = DateTime.Now, Rating = 9.0f };
+        Theater theater = new Theater { TheaterId = 1, Name = "Cineplex 10", Location = "Downtown" };
+        Screen screen = new Screen { ScreenId = 1, ScreenNumber = 5, Capacity = 100 };
+        theater.Screens.Add(screen);
+
+        // Add seats to screen
+        for (int i = 1; i <= screen.Capacity; i++)
+        {
+            screen.Seats.Add(new Seat { SeatId = i, SeatNumber = "S" + i, SeatType = "Regular" });
+        }
+
+        Show show = new Show { ShowId = 1, Movie = movie, Screen = screen, StartTime = DateTime.Now.AddHours(2), PricePerSeat = 10.00m };
+        BookingService bookingService = new BookingService();
+        PaymentService paymentService = new PaymentService();
+
+        // User selects seats
+        List<Seat> selectedSeats = new List<Seat> { screen.Seats[0], screen.Seats[1] };
+
+        // Create booking
+        Booking booking = bookingService.CreateBooking(user, show, selectedSeats);
+        Console.WriteLine($"Booking created with ID: {booking.BookingId}, Total Price: {booking.TotalPrice}");
+
+        // Process payment
+        paymentService.ProcessPayment(booking, "CreditCard");
+    }
+}

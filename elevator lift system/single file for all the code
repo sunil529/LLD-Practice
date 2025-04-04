@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// Enum for Elevator Status
+public enum ElevatorStatus { Idle, MovingUp, MovingDown, Maintenance }
+
+// Enum for Direction
+public enum Direction { Up, Down, None }
+
+// Machine Base Class
+public class Machine
+{
+    public string Manufacturer { get; set; }
+    public string ModelNumber { get; set; }
+    public bool IsOperational { get; set; } = true;
+}
+
+// Elevator Class
+public class Elevator : Machine
+{
+    public int ElevatorId { get; set; }
+    public int CurrentFloor { get; set; } = 0;
+    public ElevatorStatus Status { get; set; } = ElevatorStatus.Idle;
+    public Queue<int> Requests { get; set; } = new Queue<int>();
+
+    public void RequestFloor(int floor)
+    {
+        Requests.Enqueue(floor);
+    }
+
+    public void Move()
+    {
+        while (Requests.Count > 0)
+        {
+            int targetFloor = Requests.Dequeue();
+            if (targetFloor > CurrentFloor)
+            {
+                Status = ElevatorStatus.MovingUp;
+                Console.WriteLine($"Elevator {ElevatorId} moving up to floor {targetFloor}");
+            }
+            else if (targetFloor < CurrentFloor)
+            {
+                Status = ElevatorStatus.MovingDown;
+                Console.WriteLine($"Elevator {ElevatorId} moving down to floor {targetFloor}");
+            }
+            else
+            {
+                Status = ElevatorStatus.Idle;
+            }
+            CurrentFloor = targetFloor;
+            Console.WriteLine($"Elevator {ElevatorId} arrived at floor {CurrentFloor}");
+            Status = ElevatorStatus.Idle;
+        }
+    }
+}
+
+// Passenger Elevator (Specialization)
+public class PassengerElevator : Elevator
+{
+    public int MaxPassengers { get; set; } = 10;
+}
+
+// Freight Elevator (Specialization)
+public class FreightElevator : Elevator
+{
+    public int MaxWeightCapacity { get; set; } = 1000; // in kg
+}
+
+// User Class
+public class User
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+
+    public void RequestElevator(Building building, int floor)
+    {
+        Elevator bestElevator = building.FindClosestElevator(floor);
+        if (bestElevator != null)
+        {
+            bestElevator.RequestFloor(floor);
+            Console.WriteLine($"User {Name} requested an elevator to floor {floor}");
+        }
+    }
+}
+
+// Floor Class
+public class Floor
+{
+    public int FloorNumber { get; set; }
+    public List<User> WaitingUsers { get; set; } = new List<User>();
+}
+
+// Building Class
+public class Building
+{
+    public int BuildingId { get; set; }
+    public string Name { get; set; }
+    public List<Elevator> Elevators { get; set; } = new List<Elevator>();
+    public List<Floor> Floors { get; set; } = new List<Floor>();
+
+    public Building(int numFloors, int numElevators)
+    {
+        for (int i = 0; i < numFloors; i++)
+        {
+            Floors.Add(new Floor { FloorNumber = i });
+        }
+        for (int i = 0; i < numElevators; i++)
+        {
+            Elevators.Add(new Elevator { ElevatorId = i });
+        }
+    }
+
+    public Elevator FindClosestElevator(int requestedFloor)
+    {
+        return Elevators.OrderBy(e => Math.Abs(e.CurrentFloor - requestedFloor)).FirstOrDefault();
+    }
+}
+
+// Elevator Controller
+public class ElevatorController
+{
+    private Building building;
+
+    public ElevatorController(Building building)
+    {
+        this.building = building;
+    }
+
+    public void ProcessRequests()
+    {
+        foreach (var elevator in building.Elevators)
+        {
+            elevator.Move();
+        }
+    }
+}
+
+// Main Program
+class Program
+{
+    static void Main()
+    {
+        Building myBuilding = new Building(10, 3);
+        ElevatorController controller = new ElevatorController(myBuilding);
+
+        User user1 = new User { UserId = 1, Name = "Alice" };
+        User user2 = new User { UserId = 2, Name = "Bob" };
+
+        user1.RequestElevator(myBuilding, 5);
+        user2.RequestElevator(myBuilding, 7);
+
+        controller.ProcessRequests();
+    }
+}

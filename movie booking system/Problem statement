@@ -1,0 +1,79 @@
+Low-Level Design (LLD) Interview Question: Movie Booking System
+Problem Statement:
+Design a Movie Booking System that allows users to search for movies, view available shows, select seats, and book tickets. The system should also handle payments and notifications.
+
+Functional Requirements
+1. User Management
+Users can register and log in.
+
+Users can update their profiles (name, email, payment method, preferences).
+
+2. Movie & Show Management
+Admins can add/update movies with details (title, genre, duration, language).
+
+Admins can schedule shows in multiple theaters at specific times.
+
+Shows must be mapped to theaters and screens.
+
+3. Theater & Seat Management
+Theaters contain multiple screens.
+
+Each screen has a seating arrangement with different categories (Regular, Premium, VIP).
+
+Each seat should have a status (Available, Booked, Blocked).
+
+4. Movie Search & Filter
+Users can search for movies by name, genre, language, rating.
+
+Users can filter by location and theater.
+
+5. Booking Tickets
+Users can select a show, choose seats, and proceed with booking.
+
+Users can view the seat layout in real time.
+
+The system should temporarily block selected seats until payment is completed.
+
+6. Payments & Transactions
+Users can pay using Credit/Debit Cards, UPI, Wallets.
+
+Support for third-party payment gateways (Stripe, PayPal, Razorpay).
+
+Implement transaction failure handling & refund processing.
+
+7. Notifications & Confirmations
+Users receive email/SMS confirmations after successful bookings.
+
+Notifications for upcoming shows or cancellations.
+
+8. Booking History & Cancellation
+Users can view their past bookings.
+
+Users can cancel tickets before the show starts (with a refund policy).
+
+Non-Functional Requirements
+1. Scalability
+The system should handle millions of users & bookings.
+
+Use distributed databases for scalability.
+
+2. Performance
+Fast response times (<1 sec for seat selection).
+
+Use caching for frequently accessed data (e.g., movie details, theater layouts).
+
+3. Availability
+99.99% uptime required.
+
+Use load balancers and replicated databases.
+
+4. Security
+Secure payment processing with encryption.
+
+Role-based access control (Admin vs. User).
+
+5. Concurrency Handling
+Seat blocking mechanism to prevent race conditions in seat selection.
+
+6. Maintainability
+Use microservices for modular development (User, Booking, Payment, Notification).

@@ -1,0 +1,36 @@
+public class ParkingLotManager
+{
+    private List<ParkingSpot> spots = new List<ParkingSpot>();
+    private List<Ticket> tickets = new List<Ticket>();
+
+    public ParkingLotManager(int numSpots)
+    {
+        for (int i = 1; i <= numSpots; i++)
+        {
+            spots.Add(new ParkingSpot { SpotID = i, SpotNumber = $"P-{i}", SpotType = "General" });
+        }
+    }
+
+    public Ticket ParkVehicle(Vehicle vehicle)
+    {
+        var availableSpot = spots.Find(spot => !spot.IsOccupied);
+        if (availableSpot == null) return null;
+
+        availableSpot.IsOccupied = true;
+        var ticket = new Ticket { TicketID = tickets.Count + 1, Spot = availableSpot, Vehicle = vehicle, EntryTime = DateTime.Now };
+        tickets.Add(ticket);
+        return ticket;
+    }
+
+    public decimal ProcessExit(int ticketID)
+    {
+        var ticket = tickets.Find(t => t.TicketID == ticketID);
+        if (ticket == null || ticket.ExitTime != null) return 0;
+
+        ticket.ExitTime = DateTime.Now;
+        decimal fee = (decimal)(ticket.ExitTime.Value - ticket.EntryTime).TotalMinutes * 0.5m;
+        ticket.IsPaid = true;
+        ticket.Spot.IsOccupied = false;
+        return fee;
+    }
+}

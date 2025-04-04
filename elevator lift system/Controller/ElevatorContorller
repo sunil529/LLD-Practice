@@ -1,0 +1,18 @@
+// Elevator Controller
+public class ElevatorController
+{
+    private Building building;
+
+    public ElevatorController(Building building)
+    {
+        this.building = building;
+    }
+
+    public void ProcessRequests()
+    {
+        foreach (var elevator in building.Elevators)
+        {
+            elevator.Move();
+        }
+    }
+}

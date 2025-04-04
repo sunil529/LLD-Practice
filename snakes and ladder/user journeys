@@ -1,0 +1,95 @@
+User Journeys for Snakes and Ladders Game 🎲🐍🪜
+Here’s a breakdown of different user journeys, covering gameplay flow and interactions between the entities.
+
+🎮 1. Game Initialization
+Actors: Admin (or system)
+Steps:
+
+The system initializes a board of size 100.
+
+The system places snakes and ladders at random positions on the board.
+
+The system prompts users to enter their names and creates Player objects.
+
+The system creates a Dice object for rolling.
+
+The game is ready to start.
+
+🚀 2. Player Turn Execution
+Actors: Player, System
+Steps:
+
+The system identifies the current player from the queue.
+
+The player rolls the dice (1-6).
+
+The system calculates the new position based on the dice roll.
+
+If the new position has a snake, the player moves down.
+
+If the new position has a ladder, the player moves up.
+
+The system updates the player’s position on the board.
+
+If the player reaches exactly 100, they win, and the game ends.
+
+If the player does not win, their turn ends, and the next player gets their turn.
+
+🐍 3. Encountering a Snake
+Actors: Player, System
+Steps:
+
+The player lands on a snake’s head (e.g., 45).
+
+The system checks if a snake exists at this position.
+
+The player is moved down to the snake’s tail (e.g., 22).
+
+The system updates the player's position and announces the move.
+
+🪜 4. Climbing a Ladder
+Actors: Player, System
+Steps:
+
+The player lands on a ladder’s base (e.g., 15).
+
+The system checks if a ladder exists at this position.
+
+The player moves up to the ladder’s top (e.g., 38).
+
+The system updates the player’s position and announces the move.
+
+🏆 5. Winning the Game
+Actors: Player, System
+Steps:
+
+The player rolls the dice and exactly reaches position 100.
+
+The system declares the player as the winner.
+
+The game ends, and other players are informed.
+
+🎲 6. Handling Special Cases
+Case 1: Rolling More Than Needed (101+)
+If the player rolls a number that moves them past 100, the move is invalid, and they stay in the same position.
+
+Case 2: Multiple Players on the Same Tile
+Multiple players can share a position, and no special action is needed.
+
+Case 3: Game Timeout or Exit
+If a player quits or exceeds time, the system may:
+
+Remove the player from the queue.
+
+Declare the next player’s turn.
+
+🔹 Summary of Entity Interactions
+Player → Rolls Dice → Moves on Board.
+
+Board → Checks if Snake or Ladder Exists.
+
+Snake → Moves Player Down.
+
+Ladder → Moves Player Up.
+
+Game → Manages Players, Turns, and Declares Winner.

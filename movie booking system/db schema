@@ -1,0 +1,111 @@
+CREATE TABLE Users (
+    UserId INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    PhoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Movies (
+    MovieId INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(255) NOT NULL,
+    Genre VARCHAR(100),
+    Duration INT NOT NULL, -- Duration in minutes
+    Language VARCHAR(50),
+    ReleaseDate DATE,
+    Rating FLOAT CHECK (Rating BETWEEN 0 AND 10)
+);
+
+
+CREATE TABLE Theaters (
+    TheaterId INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Location VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE Screens (
+    ScreenId INT PRIMARY KEY AUTO_INCREMENT,
+    TheaterId INT NOT NULL,
+    ScreenNumber INT NOT NULL,
+    Capacity INT NOT NULL,
+    FOREIGN KEY (TheaterId) REFERENCES Theaters(TheaterId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Shows (
+    ShowId INT PRIMARY KEY AUTO_INCREMENT,
+    MovieId INT NOT NULL,
+    ScreenId INT NOT NULL,
+    StartTime DATETIME NOT NULL,
+    EndTime DATETIME NOT NULL,
+    AvailableSeats INT NOT NULL,
+    PricePerSeat DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (MovieId) REFERENCES Movies(MovieId) ON DELETE CASCADE,
+    FOREIGN KEY (ScreenId) REFERENCES Screens(ScreenId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Bookings (
+    BookingId INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT NOT NULL,
+    ShowId INT NOT NULL,
+    TotalPrice DECIMAL(10,2) NOT NULL,
+    PaymentStatus ENUM('Pending', 'Completed', 'Failed') DEFAULT 'Pending',
+    BookingTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE,
+    FOREIGN KEY (ShowId) REFERENCES Shows(ShowId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Seats (
+    SeatId INT PRIMARY KEY AUTO_INCREMENT,
+    ScreenId INT NOT NULL,
+    SeatNumber VARCHAR(10) NOT NULL,
+    SeatType ENUM('Regular', 'Premium', 'VIP') NOT NULL,
+    IsAvailable BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (ScreenId) REFERENCES Screens(ScreenId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Booking_Seats (
+    BookingId INT NOT NULL,
+    SeatId INT NOT NULL,
+    PRIMARY KEY (BookingId, SeatId),
+    FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId) ON DELETE CASCADE,
+    FOREIGN KEY (SeatId) REFERENCES Seats(SeatId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Payments (
+    PaymentId INT PRIMARY KEY AUTO_INCREMENT,
+    BookingId INT NOT NULL,
+    UserId INT NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+    PaymentMode ENUM('CreditCard', 'DebitCard', 'UPI', 'NetBanking', 'Wallet') NOT NULL,
+    PaymentStatus ENUM('Pending', 'Success', 'Failed') DEFAULT 'Pending',
+    TransactionId VARCHAR(50) UNIQUE NOT NULL,
+    PaymentTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId) ON DELETE CASCADE,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Discounts (
+    DiscountId INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20) UNIQUE NOT NULL,
+    DiscountPercentage FLOAT NOT NULL CHECK (DiscountPercentage BETWEEN 0 AND 100),
+    Validity DATE NOT NULL
+);
+
+
+CREATE TABLE Reviews (
+    ReviewId INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT NOT NULL,
+    MovieId INT NOT NULL,
+    Rating FLOAT CHECK (Rating BETWEEN 0 AND 10),
+    Comment TEXT,
+    ReviewDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE,
+    FOREIGN KEY (MovieId) REFERENCES Movies(MovieId) ON DELETE CASCADE
+);

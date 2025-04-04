@@ -1,0 +1,39 @@
+// Game class to manage turns using a queue
+public class Game
+{
+    private Queue<Player> players;
+    private Dice dice;
+    private Board board;
+
+    public Game(List<string> playerNames)
+    {
+        players = new Queue<Player>();
+        dice = new Dice();
+        board = new Board();
+        
+        foreach (var name in playerNames)
+        {
+            players.Enqueue(new Player { Name = name });
+        }
+    }
+
+    public void Start()
+    {
+        while (true)
+        {
+            var currentPlayer = players.Dequeue();
+            int roll = dice.Roll();
+            Console.WriteLine($"{currentPlayer.Name} rolled a {roll}");
+            currentPlayer.Position += roll;
+            currentPlayer.Position = board.MovePlayer(currentPlayer.Position);
+
+            if (board.HasWon(currentPlayer.Position))
+            {
+                Console.WriteLine($"{currentPlayer.Name} wins the game!");
+                break;
+            }
+            
+            players.Enqueue(currentPlayer);
+        }
+    }
+}

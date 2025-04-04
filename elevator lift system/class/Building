@@ -1,0 +1,25 @@
+// Building Class
+public class Building
+{
+    public int BuildingId { get; set; }
+    public string Name { get; set; }
+    public List<Elevator> Elevators { get; set; } = new List<Elevator>();
+    public List<Floor> Floors { get; set; } = new List<Floor>();
+
+    public Building(int numFloors, int numElevators)
+    {
+        for (int i = 0; i < numFloors; i++)
+        {
+            Floors.Add(new Floor { FloorNumber = i });
+        }
+        for (int i = 0; i < numElevators; i++)
+        {
+            Elevators.Add(new Elevator { ElevatorId = i });
+        }
+    }
+
+    public Elevator FindClosestElevator(int requestedFloor)
+    {
+        return Elevators.OrderBy(e => Math.Abs(e.CurrentFloor - requestedFloor)).FirstOrDefault();
+    }
+}

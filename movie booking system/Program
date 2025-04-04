@@ -1,0 +1,32 @@
+// Main Program
+class Program
+{
+    static void Main()
+    {
+        User user = new User { UserId = 1, Name = "John Doe", Email = "john@example.com", PhoneNumber = "1234567890" };
+        Movie movie = new Movie { MovieId = 101, Title = "Avengers: Endgame", Genre = "Action", Duration = 180, Language = "English", ReleaseDate = DateTime.Now, Rating = 9.0f };
+        Theater theater = new Theater { TheaterId = 1, Name = "Cineplex 10", Location = "Downtown" };
+        Screen screen = new Screen { ScreenId = 1, ScreenNumber = 5, Capacity = 100 };
+        theater.Screens.Add(screen);
+
+        // Add seats to screen
+        for (int i = 1; i <= screen.Capacity; i++)
+        {
+            screen.Seats.Add(new Seat { SeatId = i, SeatNumber = "S" + i, SeatType = "Regular" });
+        }
+
+        Show show = new Show { ShowId = 1, Movie = movie, Screen = screen, StartTime = DateTime.Now.AddHours(2), PricePerSeat = 10.00m };
+        BookingService bookingService = new BookingService();
+        PaymentService paymentService = new PaymentService();
+
+        // User selects seats
+        List<Seat> selectedSeats = new List<Seat> { screen.Seats[0], screen.Seats[1] };
+
+        // Create booking
+        Booking booking = bookingService.CreateBooking(user, show, selectedSeats);
+        Console.WriteLine($"Booking created with ID: {booking.BookingId}, Total Price: {booking.TotalPrice}");
+
+        // Process payment
+        paymentService.ProcessPayment(booking, "CreditCard");
+    }
+}

@@ -1,0 +1,8 @@
+ Summary of the Flow
+1️⃣ User object is created.
+2️⃣ NotificationManager (Publisher) is instantiated.
+3️⃣ Three notification channels (Subscribers) are created.
+4️⃣ Subscribers are attached to NotificationManager.
+5️⃣ A Notification object is created.
+6️⃣ Notify() is called, triggering each subscriber’s Update() method.
+7️⃣ Each subscriber prints the notification message in its own way.

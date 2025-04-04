@@ -1,0 +1,16 @@
+// User Class
+public class User
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+
+    public void RequestElevator(Building building, int floor)
+    {
+        Elevator bestElevator = building.FindClosestElevator(floor);
+        if (bestElevator != null)
+        {
+            bestElevator.RequestFloor(floor);
+            Console.WriteLine($"User {Name} requested an elevator to floor {floor}");
+        }
+    }
+}

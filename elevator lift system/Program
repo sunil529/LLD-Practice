@@ -1,0 +1,17 @@
+// Main Program
+class Program
+{
+    static void Main()
+    {
+        Building myBuilding = new Building(10, 3);
+        ElevatorController controller = new ElevatorController(myBuilding);
+
+        User user1 = new User { UserId = 1, Name = "Alice" };
+        User user2 = new User { UserId = 2, Name = "Bob" };
+
+        user1.RequestElevator(myBuilding, 5);
+        user2.RequestElevator(myBuilding, 7);
+
+        controller.ProcessRequests();
+    }
+}

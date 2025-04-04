@@ -1,0 +1,16 @@
+class Program
+{
+    static void Main()
+    {
+        ParkingLotManager parkingLot = new ParkingLotManager(5);
+        Vehicle vehicle = new Vehicle { LicensePlate = "XYZ123", VehicleType = "Car", OwnerName = "John Doe" };
+
+        Ticket ticket = parkingLot.ParkVehicle(vehicle);
+        Console.WriteLine($"Vehicle parked at spot {ticket.Spot.SpotNumber}");
+        
+        System.Threading.Thread.Sleep(2000); // Simulate time passage
+
+        decimal fee = parkingLot.ProcessExit(ticket.TicketID);
+        Console.WriteLine($"Total parking fee: ${fee}");
+    }
+}

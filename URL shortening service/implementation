@@ -1,0 +1,73 @@
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
+
+public class UrlShortenerService
+{
+    private Dictionary<string, ShortenedUrl> urlDatabase = new Dictionary<string, ShortenedUrl>();
+    private List<ClickAnalytics> analyticsDatabase = new List<ClickAnalytics>();
+
+    // Generates a short URL
+    public string ShortenUrl(string originalUrl, string userId = null, string customAlias = null, DateTime? expiryDate = null)
+    {
+        if (customAlias != null)
+        {
+            if (urlDatabase.ContainsKey(customAlias))
+                throw new Exception("Custom alias already exists!");
+            return SaveShortenedUrl(originalUrl, userId, customAlias, expiryDate);
+        }
+        
+        string shortCode = GenerateShortCode(originalUrl);
+        return SaveShortenedUrl(originalUrl, userId, shortCode, expiryDate);
+    }
+
+    // Redirect user based on short URL
+    public string GetOriginalUrl(string shortCode, string ipAddress)
+    {
+        if (!urlDatabase.ContainsKey(shortCode))
+            throw new Exception("Short URL not found!");
+
+        ShortenedUrl urlEntry = urlDatabase[shortCode];
+
+        if (urlEntry.ExpiryDate.HasValue && urlEntry.ExpiryDate < DateTime.Now)
+            throw new Exception("This link has expired!");
+
+        urlEntry.ClickCount++; // Increment analytics
+        analyticsDatabase.Add(new ClickAnalytics { ShortCode = shortCode, IPAddress = ipAddress, ClickTime = DateTime.Now });
+
+        return urlEntry.OriginalUrl;
+    }
+
+    // Generates a short code (hash-based)
+    private string GenerateShortCode(string url)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(url + DateTime.Now.Ticks));
+            return Convert.ToBase64String(hashBytes).Substring(0, 6).Replace("/", "X").Replace("+", "Y");
+        }
+    }
+
+    // Saves the short URL to database
+    private string SaveShortenedUrl(string originalUrl, string userId, string shortCode, DateTime? expiryDate)
+    {
+        urlDatabase[shortCode] = new ShortenedUrl
+        {
+            ShortCode = shortCode,
+            OriginalUrl = originalUrl,
+            UserId = userId,
+            CreatedAt = DateTime.Now,
+            ExpiryDate = expiryDate,
+            ClickCount = 0
+        };
+        return shortCode;
+    }
+
+    // Retrieves analytics for a user’s links
+    public List<ClickAnalytics> GetAnalytics(string userId)
+    {
+        return analyticsDatabase.Where(a => urlDatabase[a.ShortCode].UserId == userId).ToList();
+    }
+}

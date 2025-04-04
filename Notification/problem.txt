@@ -1,0 +1,129 @@
+Problem Statement:
+Design a scalable and efficient Notification System that can be used by e-commerce platforms like Amazon or 
+Flipkart to send notifications to users. The system should support multiple notification 
+channels (Email, SMS, Push Notifications, Webhooks, etc.) and allow users to configure their notification preferences.
+
+Functional Requirements:
+Support multiple notification channels: Email, SMS, Push notifications, Webhooks, etc.
+
+User Preferences: Users can enable/disable notifications for different channels.
+
+Notification Types:
+
+Order Confirmation
+
+Delivery Updates
+
+Promotional Offers
+
+Account Security Alerts
+
+Batch Processing: Ability to send notifications in bulk.
+
+Retry Mechanism: If a notification fails, the system should retry after a delay.
+
+Priority Handling: Some notifications (e.g., security alerts) must be sent immediately.
+
+Asynchronous Processing: Decouple notification generation from actual sending.
+
+Logging & Auditing: Store logs of sent notifications for debugging and analytics.
+
+Third-Party Integration: Support third-party notification services like Twilio, Firebase, and SES.
+
+Rate Limiting: Prevent spamming users with too many notifications.
+
+Template Management: Store and manage different notification templates.
+
+Non-Functional Requirements:
+Scalability: Should handle millions of notifications per day.
+
+Fault Tolerance: If one channel (e.g., SMS) fails, others should still work.
+
+High Availability: The system should be available 24/7.
+
+Performance: Notifications should be processed within seconds.
+
+Security: Ensure that notifications (especially account-related ones) are secure.
+
+Extensibility: Ability to add new notification channels in the future.
+
+Consistency: Notifications should not be lost due to system failures.
+
+Follow-Up Questions (Interview Scenarios)
+Q)How will you ensure real-time notifications for urgent messages?
+
+To ensure real-time notifications for urgent messages:
+
+Priority Queue: Maintain a priority queue where urgent messages (like security alerts) are processed first.
+
+WebSockets: Use WebSockets for instant push notifications in real-time applications.
+
+Kafka / RabbitMQ: Implement message queues (e.g., Kafka, RabbitMQ) for event-driven real-time processing.
+
+Push Notification Services: Leverage third-party services like Firebase Cloud Messaging (FCM) or Apple Push Notification Service (APNs).
+
+Retries with Exponential Backoff: Immediate retries if an urgent notification fails.
+
+Q)How would you implement a retry mechanism for failed notifications?
+To handle failed notifications, implement:
+
+Retry with Exponential Backoff: If a notification fails, retry after an increasing delay (e.g., 1s, 2s, 4s, etc.).
+
+Dead Letter Queue (DLQ): Store failed notifications and reprocess them later.
+
+Logging & Alerting: Log failures and send alerts for manual intervention if needed.
+
+Q)How can you scale the system to support billions of notifications?
+o scale to billions of notifications:
+
+Distributed Architecture: Use Kafka, RabbitMQ, or AWS SQS for message queues.
+
+Microservices-Based Design: Break the system into independent services (e.g., Email Service, SMS Service).
+
+Database Optimization: Use NoSQL (MongoDB, Cassandra) for storing notifications efficiently.
+
+Load Balancing: Distribute load using Kubernetes, Nginx, or AWS Load Balancer.
+
+Caching: Store user preferences and templates in Redis to reduce database load.
+
+Q)How will you manage user notification preferences efficiently?
+Users may want to receive only specific types of notifications.
+
+Strategies:
+
+Database Storage: Store preferences in a UserPreferences table.
+
+Cache Preferences: Use Redis to avoid repeated database queries.
+
+Filter Before Sending: Check user preferences before sending a notification.
+
+Q)Which design patterns would you use in this system? (Observer, Factory, etc.)
+Observer Pattern: Already used to notify multiple subscribers.
+
+Factory Pattern: To create different notification senders dynamically.
+
+Singleton Pattern: To manage NotificationManager as a single instance.
+
+Strategy Pattern: To switch between different notification strategies dynamically.
+
+Adapter Pattern: To integrate third-party services like Twilio, Firebase, etc.
+
+Q)How would you ensure notifications are not sent multiple times due to failures?
+To prevent duplicate notifications:
+
+Idempotency: Assign a unique Notification ID and check if it was already processed.
+
+Distributed Locks: Use Redis locks to prevent concurrent processing.
+
+Database Transactions: Store notifications in a status table and update only once.
+
+Deduplication in Kafka: Use Kafka exactly-once processing.
+
+Q)How will you integrate third-party notification services?
+To send notifications via third-party services like Twilio, Firebase, or AWS SNS:
+
+Use an Adapter Pattern: Create an adapter for each provider.
+
+API Abstraction: Implement an interface for all providers.
+
+Failover Mechanism: If one service fails, fallback to another.

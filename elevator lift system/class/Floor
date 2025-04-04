@@ -1,0 +1,6 @@
+// Floor Class
+public class Floor
+{
+    public int FloorNumber { get; set; }
+    public List<User> WaitingUsers { get; set; } = new List<User>();
+}

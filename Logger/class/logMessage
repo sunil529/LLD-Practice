@@ -1,0 +1,13 @@
+public class LogMessage{
+    public string message(get;set;)
+    public datetime timestamp(get;set;)
+    public string source(get;set;)
+    public LogLevel level(get;set;)
+   public LogMessage(LogLevel level,string message,string source)
+   {
+    timestamp=datetime.utcnow();
+    this.level=level;
+    this.message=message;
+    this.source=source;
+   }
+}

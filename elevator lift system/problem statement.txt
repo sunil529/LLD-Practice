@@ -1,0 +1,73 @@
+Low-Level Design (LLD) Interview Question: Elevator (Lift) System
+Problem Statement:
+Design an Elevator (Lift) system that efficiently transports passengers between floors in a multi-story building while considering requests from multiple users. The system should handle multiple elevators, prioritize requests, and ensure smooth operation.
+
+🔹 Functional Requirements (FRs)
+Multiple Elevators: The system should support multiple elevators operating in the same building.
+
+User Requests:
+
+External Requests: A user can press an Up or Down button from a floor to request an elevator.
+
+Internal Requests: A user inside the elevator can select a target floor.
+
+Elevator Movement:
+
+Elevators move up or down based on pending requests.
+
+If there are no requests, an elevator remains idle at its last position.
+
+Floor Prioritization:
+
+If multiple requests exist, the elevator follows a "Shortest Seek Time First" (SSTF) approach.
+
+Requests in the same direction are served first before changing direction.
+
+Doors Operation:
+
+The elevator door should open when reaching a requested floor.
+
+A small delay should be added before closing the doors.
+
+Capacity Management:
+
+The elevator cannot accept new passengers beyond its weight or person limit.
+
+Emergency Handling:
+
+Emergency stop button inside the elevator.
+
+Alarm system for trapped passengers.
+
+Priority override for firefighters.
+
+Maintenance Mode:
+
+The elevator should stop taking requests when under maintenance.
+
+Display and Indicators:
+
+Display the current floor inside and outside the elevator.
+
+Show the direction (Up/Down).
+
+Sound/voice alerts for arrival at a floor.
+
+🔹 Non-Functional Requirements (NFRs)
+Scalability: Should support multiple elevators in large buildings.
+
+Reliability: The system should be operational 24/7 with minimal downtime.
+
+Performance: Quick response time to user requests.
+
+Safety: Emergency brakes, overload detection, and fire safety compliance.
+
+Concurrency Handling: Multiple users can request at the same time.
+
+Failover Mechanism: If one elevator fails, requests should be reassigned to other elevators.
+
+Logging & Monitoring: Log user requests, elevator movements, and errors for debugging.
+
+Energy Efficiency: Optimize the elevator movement to reduce energy consumption.
+
+Fault Tolerance: In case of power failure, elevators should stop safely at the nearest floor.

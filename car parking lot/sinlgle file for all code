@@ -1,0 +1,295 @@
+using System;
+using System.Collections.Generic;
+
+// Entity: ParkingSpot
+public class ParkingSpot
+{
+    public int SpotID { get; set; }
+    public string SpotNumber { get; set; }
+    public string SpotType { get; set; }
+    public bool IsOccupied { get; set; } = false;
+}
+
+// Entity: Vehicle
+public class Vehicle
+{
+    public string LicensePlate { get; set; }
+    public string VehicleType { get; set; }
+    public string OwnerName { get; set; }
+}
+
+// Entity: Ticket
+public class Ticket
+{
+    public int TicketID { get; set; }
+    public ParkingSpot Spot { get; set; }
+    public Vehicle Vehicle { get; set; }
+    public DateTime EntryTime { get; set; }
+    public DateTime? ExitTime { get; set; }
+    public bool IsPaid { get; set; } = false;
+}
+
+// Entity: Payment
+public class Payment
+{
+    public int PaymentID { get; set; }
+    public Ticket Ticket { get; set; }
+    public decimal Amount { get; set; }
+    public string PaymentMethod { get; set; }
+    public bool PaymentStatus { get; set; } = false;
+}
+
+// Parking Lot Manager
+public class ParkingLotManager
+{
+    private List<ParkingSpot> spots = new List<ParkingSpot>();
+    private List<Ticket> tickets = new List<Ticket>();
+
+    public ParkingLotManager(int numSpots)
+    {
+        for (int i = 1; i <= numSpots; i++)
+        {
+            spots.Add(new ParkingSpot { SpotID = i, SpotNumber = $"P-{i}", SpotType = "General" });
+        }
+    }
+
+    public Ticket ParkVehicle(Vehicle vehicle)
+    {
+        var availableSpot = spots.Find(spot => !spot.IsOccupied);
+        if (availableSpot == null) return null;
+
+        availableSpot.IsOccupied = true;
+        var ticket = new Ticket { TicketID = tickets.Count + 1, Spot = availableSpot, Vehicle = vehicle, EntryTime = DateTime.Now };
+        tickets.Add(ticket);
+        return ticket;
+    }
+
+    public decimal ProcessExit(int ticketID)
+    {
+        var ticket = tickets.Find(t => t.TicketID == ticketID);
+        if (ticket == null || ticket.ExitTime != null) return 0;
+
+        ticket.ExitTime = DateTime.Now;
+        decimal fee = (decimal)(ticket.ExitTime.Value - ticket.EntryTime).TotalMinutes * 0.5m;
+        ticket.IsPaid = true;
+        ticket.Spot.IsOccupied = false;
+        return fee;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        ParkingLotManager parkingLot = new ParkingLotManager(5);
+        Vehicle vehicle = new Vehicle { LicensePlate = "XYZ123", VehicleType = "Car", OwnerName = "John Doe" };
+
+        Ticket ticket = parkingLot.ParkVehicle(vehicle);
+        Console.WriteLine($"Vehicle parked at spot {ticket.Spot.SpotNumber}");
+        
+        System.Threading.Thread.Sleep(2000); // Simulate time passage
+
+        decimal fee = parkingLot.ProcessExit(ticket.TicketID);
+        Console.WriteLine($"Total parking fee: ${fee}");
+    }
+}
+
+
+---------------------------------------------------------------------------------------
+version 2
+
+
+using System;
+using System.Collections.Generic;
+
+// 1. Enum for Vehicle Type
+public enum VehicleType
+{
+    Car,
+    Bike,
+    Truck
+}
+
+// 2. Enum for Payment Status
+public enum PaymentStatus
+{
+    Pending,
+    Completed,
+    Failed
+}
+
+// 3. Parking Rate - Defines rates for different vehicles
+public class ParkingRate
+{
+    private static readonly Dictionary<VehicleType, decimal> rates = new Dictionary<VehicleType, decimal>
+    {
+        { VehicleType.Car, 10.0m },   // $10 per hour
+        { VehicleType.Bike, 5.0m },   // $5 per hour
+        { VehicleType.Truck, 20.0m }  // $20 per hour
+    };
+
+    public static decimal GetRate(VehicleType vehicleType)
+    {
+        return rates[vehicleType];
+    }
+}
+
+// 4. Vehicle Class
+public class Vehicle
+{
+    public string LicensePlate { get; set; }
+    public VehicleType Type { get; set; }
+
+    public Vehicle(string licensePlate, VehicleType type)
+    {
+        LicensePlate = licensePlate;
+        Type = type;
+    }
+}
+
+// 5. Parking Slot Class
+public class ParkingSlot
+{
+    public int SlotId { get; set; }
+    public VehicleType SlotType { get; set; }
+    public bool IsOccupied { get; set; }
+
+    public ParkingSlot(int id, VehicleType type)
+    {
+        SlotId = id;
+        SlotType = type;
+        IsOccupied = false;
+    }
+}
+
+// 6. Parking Ticket Class
+public class Ticket
+{
+    public int TicketId { get; set; }
+    public Vehicle Vehicle { get; set; }
+    public DateTime EntryTime { get; set; }
+    public DateTime? ExitTime { get; set; }
+    public ParkingSlot Slot { get; set; }
+
+    public Ticket(int id, Vehicle vehicle, ParkingSlot slot)
+    {
+        TicketId = id;
+        Vehicle = vehicle;
+        Slot = slot;
+        EntryTime = DateTime.Now;
+    }
+
+    public void MarkExit()
+    {
+        ExitTime = DateTime.Now;
+    }
+
+    public int GetParkingDurationInHours()
+    {
+        if (!ExitTime.HasValue) return 0;
+        return (int)Math.Ceiling((ExitTime.Value - EntryTime).TotalHours);
+    }
+}
+
+// 7. Payment Class
+public class Payment
+{
+    public int PaymentId { get; set; }
+    public Ticket Ticket { get; set; }
+    public decimal Amount { get; set; }
+    public PaymentStatus Status { get; set; }
+
+    public Payment(int id, Ticket ticket)
+    {
+        PaymentId = id;
+        Ticket = ticket;
+        Amount = CalculateParkingFee(ticket);
+        Status = PaymentStatus.Pending;
+    }
+
+    public static decimal CalculateParkingFee(Ticket ticket)
+    {
+        int hoursParked = ticket.GetParkingDurationInHours();
+        decimal rate = ParkingRate.GetRate(ticket.Vehicle.Type);
+        return hoursParked * rate;
+    }
+
+    public void CompletePayment()
+    {
+        Status = PaymentStatus.Completed;
+    }
+}
+
+// 8. Parking Lot - Singleton Class
+public class ParkingLot
+{
+    private static readonly ParkingLot instance = new ParkingLot();
+    private List<ParkingSlot> slots;
+    private List<Ticket> activeTickets;
+    private int ticketCounter = 1;
+    private int paymentCounter = 1;
+
+    private ParkingLot()
+    {
+        slots = new List<ParkingSlot>
+        {
+            new ParkingSlot(1, VehicleType.Car),
+            new ParkingSlot(2, VehicleType.Car),
+            new ParkingSlot(3, VehicleType.Bike),
+            new ParkingSlot(4, VehicleType.Truck)
+        };
+        activeTickets = new List<Ticket>();
+    }
+
+    public static ParkingLot Instance => instance;
+
+    public Ticket ParkVehicle(Vehicle vehicle)
+    {
+        var availableSlot = slots.Find(s => s.SlotType == vehicle.Type && !s.IsOccupied);
+        if (availableSlot == null)
+        {
+            Console.WriteLine("No available slot for vehicle type: " + vehicle.Type);
+            return null;
+        }
+
+        availableSlot.IsOccupied = true;
+        Ticket ticket = new Ticket(ticketCounter++, vehicle, availableSlot);
+        activeTickets.Add(ticket);
+
+        Console.WriteLine($"Vehicle {vehicle.LicensePlate} parked at Slot {availableSlot.SlotId}.");
+        return ticket;
+    }
+
+    public Payment ExitVehicle(Ticket ticket)
+    {
+        ticket.MarkExit();
+        ticket.Slot.IsOccupied = false;
+        activeTickets.Remove(ticket);
+
+        Payment payment = new Payment(paymentCounter++, ticket);
+        payment.CompletePayment();
+
+        Console.WriteLine($"Vehicle {ticket.Vehicle.LicensePlate} exited. Total Fee: ${payment.Amount}");
+        return payment;
+    }
+}
+
+// 9. Main Program
+class Program
+{
+    static void Main()
+    {
+        ParkingLot parkingLot = ParkingLot.Instance;
+
+        // Vehicle arrives
+        Vehicle car = new Vehicle("ABC123", VehicleType.Car);
+        Ticket ticket = parkingLot.ParkVehicle(car);
+
+        if (ticket != null)
+        {
+            // Simulate parking duration (sleep for demo)
+            System.Threading.Thread.Sleep(2000);
+            Payment payment = parkingLot.ExitVehicle(ticket);
+        }
+    }
+}

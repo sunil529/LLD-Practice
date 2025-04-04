@@ -1,0 +1,7 @@
+public class FileLogger:Ilogger
+{
+    public void log(LogMessage logMessage)
+    {
+        console.writeline("this is fileLogger type logs");
+    }
+}

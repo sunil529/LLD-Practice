@@ -1,0 +1,203 @@
+1. User
+Represents: A customer making payments or a merchant receiving payments.
+Attributes:
+
+UserId (PK) – Unique identifier for the user.
+
+Name – Full name of the user.
+
+Email – Email address.
+
+PhoneNumber – Contact number.
+
+UserType – Enum (CUSTOMER, MERCHANT, ADMIN).
+
+CreatedAt – Account creation date.
+
+UpdatedAt – Last modified date.
+
+🔹 Responsibilities:
+
+Can initiate a transaction.
+
+Can view transaction history.
+
+Merchants receive payments.
+
+2. PaymentMethod
+Represents: The payment method chosen by the user.
+Attributes:
+
+PaymentMethodId (PK) – Unique identifier.
+
+UserId (FK) – Links to the user.
+
+Type – Enum (CREDIT_CARD, DEBIT_CARD, UPI, WALLET, NET_BANKING).
+
+Provider – Payment provider (Visa, MasterCard, PayPal, etc.).
+
+TokenizedDetails – Secure tokenized data instead of raw card details.
+
+CreatedAt – Timestamp when added.
+
+🔹 Responsibilities:
+
+Stores the user’s preferred payment methods.
+
+Uses tokenization for security.
+
+Handles selection during transactions.
+
+3. Transaction
+Represents: A single payment transaction.
+Attributes:
+
+TransactionId (PK) – Unique identifier.
+
+UserId (FK) – User who initiated the transaction.
+
+MerchantId (FK) – Merchant receiving the payment.
+
+Amount – Payment amount.
+
+Currency – Transaction currency.
+
+PaymentMethodId (FK) – Payment method used.
+
+Status – Enum (PENDING, SUCCESS, FAILED, REFUNDED).
+
+TransactionType – Enum (PAYMENT, REFUND).
+
+CreatedAt – Transaction initiation time.
+
+UpdatedAt – Last status update.
+
+🔹 Responsibilities:
+
+Stores all payment transactions.
+
+Tracks the status of payments.
+
+Allows retry in case of failure.
+
+4. PaymentGateway
+Represents: External payment services handling payments (Stripe, Razorpay, PayPal).
+Attributes:
+
+GatewayId (PK) – Unique identifier.
+
+Name – Payment gateway name.
+
+APIKey – Secure API authentication.
+
+TransactionFee – Fee charged per transaction.
+
+CurrencySupported – List of supported currencies.
+
+CreatedAt – Timestamp.
+
+🔹 Responsibilities:
+
+Processes payments through third-party providers.
+
+Validates transactions and returns success/failure.
+
+Handles refunds & chargebacks.
+
+5. Refund
+Represents: A refund transaction when a user requests a refund.
+Attributes:
+
+RefundId (PK) – Unique identifier.
+
+TransactionId (FK) – Transaction being refunded.
+
+UserId (FK) – User requesting a refund.
+
+MerchantId (FK) – Merchant processing the refund.
+
+Amount – Refunded amount.
+
+Status – Enum (PENDING, SUCCESS, FAILED).
+
+CreatedAt – Refund request time.
+
+🔹 Responsibilities:
+
+Processes refunds for transactions.
+
+Works with the PaymentGateway for refunds.
+
+Tracks refund status.
+
+6. Notification
+Represents: Notifications sent to users about payments.
+Attributes:
+
+NotificationId (PK) – Unique identifier.
+
+UserId (FK) – User receiving the notification.
+
+Type – Enum (SMS, EMAIL, PUSH).
+
+Message – Notification content.
+
+Status – SENT or FAILED.
+
+CreatedAt – Timestamp.
+
+🔹 Responsibilities:
+
+Notifies users of successful, failed, or refunded transactions.
+
+Can be integrated with Observer Pattern.
+
+7. AuditLog
+Represents: Logs for transaction activity.
+Attributes:
+
+LogId (PK) – Unique identifier.
+
+TransactionId (FK) – Associated transaction.
+
+Action – Enum (CREATED, UPDATED, FAILED).
+
+Message – Log message.
+
+Timestamp – Date and time.
+
+🔹 Responsibilities:
+
+Stores logs for tracking issues.
+
+Useful for debugging and compliance.
+
+8. FraudDetection
+Represents: A system detecting suspicious payments.
+Attributes:
+
+FraudCheckId (PK) – Unique identifier.
+
+TransactionId (FK) – Transaction being checked.
+
+RiskScore – Score indicating fraud risk.
+
+Status – Enum (SAFE, SUSPICIOUS, BLOCKED).
+
+CreatedAt – Timestamp.
+
+🔹 Responsibilities:
+
+Uses AI/ML or rule-based checks for fraud detection.
+
+Blocks high-risk transactions.
+
+Relationships Between Entities
+✅ User has multiple PaymentMethods (1 User → Many PaymentMethods).
+✅ User can initiate multiple Transactions (1 User → Many Transactions).
+✅ Transaction belongs to a PaymentMethod (1 PaymentMethod → Many Transactions).
+✅ Transaction is processed by a PaymentGateway (1 Gateway → Many Transactions).
+✅ Transaction may have a Refund (1 Transaction → 1 Refund max).
+✅ Notification is triggered per transaction (1 Transaction → Many Notifications).
+✅ Transaction generates multiple AuditLogs (1 Transaction → Many Logs).
+✅ Transaction undergoes FraudDetection (1 Transaction → 1 FraudCheck).

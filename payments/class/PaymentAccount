@@ -1,0 +1,6 @@
+public class PaymentAccount
+{
+    public int AccountId { get; set; }
+    public User Owner { get; set; }
+    public decimal Balance { get; set; }
+}

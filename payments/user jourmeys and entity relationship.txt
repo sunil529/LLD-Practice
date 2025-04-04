@@ -1,0 +1,71 @@
+User Journeys & Entity Relationships for Payment System
+User Journeys
+1️⃣ User Registration & Payment Method Setup
+
+The User registers an account.
+
+User adds a PaymentMethod (credit card, UPI, wallet, etc.).
+
+The system tokenizes the payment details for security.
+
+2️⃣ Making a Payment
+
+User selects a product/service on a merchant platform.
+
+Chooses a PaymentMethod and initiates a Transaction.
+
+The system interacts with a PaymentGateway to process the payment.
+
+The transaction status updates based on success/failure.
+
+User receives a Notification confirming the payment.
+
+3️⃣ Failed Payment & Retry Mechanism
+
+If a transaction fails, the system logs an AuditLog.
+
+The system attempts a Retry based on the retry policy.
+
+If retries fail, the user is notified and can choose another PaymentMethod.
+
+4️⃣ Refund Request
+
+User requests a Refund for a previous Transaction.
+
+The system validates the refund policy.
+
+The refund request is processed via PaymentGateway.
+
+The refund status updates, and the user receives a Notification.
+
+5️⃣ Fraud Detection & Blocking Suspicious Transactions
+
+Every transaction undergoes FraudDetection.
+
+If marked SUSPICIOUS, the payment is blocked, and the user is notified.
+
+High-risk transactions are escalated for manual review.
+
+Entity Relationships (Has-A & Is-A Relationships)
+Entity	Relationship Type	Target Entity	Description
+User	Has-A	PaymentMethod	A user can have multiple saved payment methods.
+User	Has-A	Transaction	A user can make multiple transactions.
+User	Has-A	Notification	A user receives notifications for transactions.
+Transaction	Has-A	PaymentMethod	Each transaction uses one payment method.
+Transaction	Has-A	PaymentGateway	A transaction is processed by a payment gateway.
+Transaction	Has-A	Refund	A transaction may have one refund.
+Transaction	Has-A	AuditLog	A transaction generates multiple audit logs.
+Transaction	Has-A	FraudDetection	Each transaction is evaluated for fraud.
+PaymentMethod	Is-A	User	A payment method belongs to a user.
+Refund	Is-A	Transaction	A refund is linked to a transaction.
+Notification	Is-A	Transaction	A notification is triggered by a transaction.
+AuditLog	Is-A	Transaction	Each transaction creates logs for tracking.
+FraudDetection	Is-A	Transaction	Each transaction undergoes fraud analysis.
+PaymentGateway	Is-A	Third-party Service	The payment gateway is an external service like Stripe or PayPal.
+
+Summary
+Has-A Relationships: Define composition where one entity contains another (e.g., User has PaymentMethods).
+
+Is-A Relationships: Define inheritance (e.g., Refund is a type of Transaction).
+
+The User interacts with Transactions, which interact with PaymentGateways, Refunds, Notifications, and FraudDetection.

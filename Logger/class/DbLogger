@@ -1,0 +1,7 @@
+public class DbLogger:Ilogger
+{
+    public void log(LogMessage logMessage)
+    {
+        console.writeline("this is DbLogger type logs");
+    }
+}

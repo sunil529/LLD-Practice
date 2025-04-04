@@ -1,0 +1,10 @@
+// Entity: Booking
+public class Booking
+{
+    public int BookingId { get; set; }
+    public User User { get; set; }
+    public Show Show { get; set; }
+    public List<Seat> Seats { get; set; } = new List<Seat>();
+    public decimal TotalPrice { get; set; }
+    public string PaymentStatus { get; set; } // Pending, Completed, Failed
+}

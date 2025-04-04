@@ -1,0 +1,19 @@
+Entities and Attributes
+Entity	Attributes
+Building	BuildingID, Floors, Elevators
+Elevator	ElevatorID, CurrentFloor, Status (Moving, Idle, Maintenance), Direction (Up/Down), Capacity, Speed
+Floor	FloorNumber, UpButton, DownButton
+UserRequest	RequestID, SourceFloor, DestinationFloor, Direction, Status (Pending, Completed)
+ElevatorRequest	RequestID, ElevatorID, TargetFloor
+DisplayPanel	ElevatorID, CurrentFloor, Direction, DoorStatus (Open/Closed)
+EmergencySystem	AlarmStatus, EmergencyStop
+
+Entity	Relationship Type	Related Entity	Description
+Elevator	IS-A	Machine	An elevator is a type of machine.
+PassengerElevator	IS-A	Elevator	A passenger elevator is a specialized elevator.
+FreightElevator	IS-A	Elevator	A freight elevator is a specialized elevator.
+Building	HAS-A	List<Elevator>	A building contains multiple elevators.
+Elevator	HAS-A	Floor	An elevator has a current floor.
+Floor	HAS-A	List<UserRequest>	A floor has multiple user requests.
+ElevatorController	HAS-A	List<UserRequest>	The controller manages active requests.
+User	HAS-A	UserRequest	A user generates a request.

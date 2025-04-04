@@ -1,0 +1,70 @@
+Problem Statement:
+Design a Snakes and Ladders game where multiple players roll a dice and move accordingly on a game board. The game should handle snakes (move down), ladders (move up), and turns in an efficient manner.
+
+Functional Requirements
+✅ Board Setup:
+
+The game board consists of N numbered squares (typically 1 to 100).
+
+There are S snakes and L ladders, each defined by a start and end position.
+
+✅ Players:
+
+The game supports M players, each identified by a unique name.
+
+Players take turns rolling a six-sided dice (values: 1 to 6).
+
+✅ Game Rules:
+
+Players start at position 1 and must reach 100 exactly to win.
+
+If a player lands on a snake's head, they move down to the snake's tail.
+
+If a player lands at the bottom of a ladder, they move up to its top.
+
+Rolling a 6 grants an extra turn.
+
+✅ Turn Handling:
+
+The game enforces player turns in a cyclic order.
+
+The system ensures that players roll the dice and move accordingly.
+
+✅ Winning Condition:
+
+The first player to reach exactly 100 wins the game.
+
+If a player’s move exceeds 100, they remain in their current position.
+
+✅ Multiplayer Support:
+
+The system should support multiple players in the game session.
+
+Non-Functional Requirements
+⚡ Concurrency Handling:
+
+Ensure that multiple players cannot take the same turn simultaneously.
+
+🛠 Scalability:
+
+The system should support different board sizes and configurations.
+
+🔄 Extensibility:
+
+Support custom game rules, such as power-ups or penalties.
+
+📜 Logging and Auditing:
+
+Maintain logs of moves for debugging and tracking.
+
+⏳ Performance Optimization:
+
+Use efficient data structures (HashMaps, Queues) for fast lookups.
+
+🖥 User Interface:
+
+CLI-based or Web-based UI to show the board and moves visually.
+
+🔌 Persistence (Optional):
+
+Store game state to allow resuming an interrupted game.

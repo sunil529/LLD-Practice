@@ -1,0 +1,6 @@
+// Dice class for rolling random values
+public class Dice
+{
+    private Random random = new Random();
+    public int Roll() => random.Next(1, 7); // Generates a random number between 1 and 6
+}

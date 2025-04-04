@@ -1,0 +1,8 @@
+Entity Relationships (Has-A / Is-A)
+Entity	Relationship Type	Related Entity
+Board	Has-A	Snake, Ladder
+Snake	Is-A	Board Element
+Ladder	Is-A	Board Element
+Player	Has-A	Board
+Player	Has-A	Dice
+Game	Has-A	Board, Players, Dice

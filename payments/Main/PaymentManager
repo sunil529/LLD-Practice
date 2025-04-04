@@ -1,0 +1,32 @@
+public class PaymentManager
+{
+    private List<INotificationObserver> _observers = new List<INotificationObserver>();
+    private IPaymentGateway _gateway;
+
+    public PaymentManager(IPaymentGateway gateway)
+    {
+        _gateway = gateway;
+    }
+
+    public void Attach(INotificationObserver observer) => _observers.Add(observer);
+    public void Detach(INotificationObserver observer) => _observers.Remove(observer);
+
+    public void ProcessTransaction(Transaction transaction)
+    {
+        int retryCount = 3;
+        while (retryCount > 0)
+        {
+            bool success = _gateway.Process(transaction);
+            if (success)
+            {
+                transaction.Status = "Success";
+                break;
+            }
+            retryCount--;
+            Thread.Sleep(1000);
+        }
+        if (retryCount == 0) transaction.Status = "Failed";
+
+        foreach (var observer in _observers) observer.Notify(transaction);
+    }
+}

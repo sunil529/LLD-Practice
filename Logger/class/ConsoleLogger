@@ -1,0 +1,7 @@
+public class ConsoleLogger:Ilogger
+{
+    public void log(LogMessage logMessage)
+    {
+        console.writeline("this is ConsoleLogger type logs");
+    }
+}

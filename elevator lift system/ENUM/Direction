@@ -1,0 +1,2 @@
+// Enum for Direction
+public enum Direction { Up, Down, None }

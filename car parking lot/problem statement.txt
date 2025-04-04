@@ -1,0 +1,55 @@
+Problem Statement: Car Parking Lot System
+Objective
+Design a Car Parking Lot System that efficiently manages vehicle parking, ensures optimal space utilization, and supports multiple parking types (e.g., compact, large, electric vehicle slots). The system should handle ticket generation, payments, parking allocation, and real-time monitoring.
+
+📌 Functional Requirements
+1️⃣ Parking Lot Management
+✅ The system should allow creating and configuring parking lots with different zones.
+✅ It should support different vehicle types (motorcycles, cars, buses, EVs).
+✅ Slot allocation should be optimized based on vehicle size and availability.
+✅ System should track occupied and vacant parking slots in real-time.
+✅ Users can reserve a parking slot in advance.
+✅ Parking lot should support entry and exit gates for vehicle movement.
+
+2️⃣ Ticketing & Payment
+✅ System should generate a unique parking ticket when a vehicle enters.
+✅ Ticket should contain entry time, slot number, vehicle details, and a barcode/QR code.
+✅ Parking fee calculation should be based on duration and vehicle type.
+✅ Support multiple payment methods (cash, card, UPI, e-wallets).
+✅ Support prepaid subscriptions or memberships for frequent users.
+
+3️⃣ Vehicle Entry & Exit Handling
+✅ Users must scan a QR code/ticket at the exit gate to process payments.
+✅ The system should validate tickets and automatically open the exit gate after payment.
+✅ If the vehicle overstays a reservation, a penalty fee should be charged.
+✅ Integration with ANPR (Automatic Number Plate Recognition) for automatic check-in.
+
+4️⃣ Admin & Reports
+✅ Admin dashboard to monitor parking status and revenue.
+✅ Generate daily, weekly, and monthly reports on parking usage.
+✅ Support dynamic pricing based on demand (e.g., peak-hour pricing).
+✅ Admins can manually override parking slot assignments in special cases.
+
+📌 Non-Functional Requirements
+1️⃣ Performance & Scalability
+✅ System should handle thousands of vehicles per second efficiently.
+✅ Implement caching for frequently accessed data (e.g., slot availability).
+✅ Use load balancing to distribute requests across multiple servers.
+✅ Support multiple parking lots across different locations in a single system.
+
+2️⃣ Availability & Reliability
+✅ The system must be highly available (99.99% uptime) with failover mechanisms.
+✅ Use replicated databases to prevent data loss.
+✅ Implement disaster recovery strategies for data backup & restoration.
+
+3️⃣ Security
+✅ Encrypt user & vehicle data to ensure privacy.
+✅ Implement role-based access control (RBAC) for admin and user access.
+✅ Prevent ticket fraud and duplicate entries using secure hash-based ticket validation.
+✅ Audit logs should track who enters, exits, and modifies parking records.
+
+4️⃣ Maintainability & Extensibility
+✅ The system should be modular, allowing easy addition of new features (e.g., valet parking).
+✅ Use microservices architecture to scale different components independently.
+✅ Provide APIs for integration with third-party services (e.g., Google Maps for directions).
+

@@ -1,0 +1,69 @@
+User Journeys for Car Parking Lot System
+1. Vehicle Entry Process
+A vehicle arrives at the parking lot entrance.
+
+The system checks for available parking slots.
+
+If a slot is available:
+
+The system assigns a parking slot.
+
+The entry timestamp is recorded.
+
+A parking ticket is generated and given to the driver.
+
+If no slot is available:
+
+The system notifies the driver that the lot is full.
+
+2. Vehicle Exit Process
+The driver presents the parking ticket at the exit.
+
+The system calculates the parking fee based on:
+
+Parking duration.
+
+Vehicle type (car, bike, truck).
+
+Special discounts (if applicable).
+
+The driver makes the payment via cash, card, or digital wallet.
+
+The system marks the parking slot as available.
+
+The vehicle exits.
+
+3. Admin Parking Lot Management
+The admin can:
+
+Add/remove/update parking slots.
+
+View occupancy details and available slots.
+
+Set different parking rates based on time, vehicle type, or special conditions.
+
+Monitor parking lot capacity in real time.
+
+4. Real-Time Parking Availability Check
+Users can check available parking slots via:
+
+Mobile app.
+
+Website.
+
+Digital display at the parking lot entrance.
+
+5. Payment & Billing System
+Users can pay using:
+
+Cash.
+
+Credit/Debit Card.
+
+Digital Wallets (UPI, PayPal, etc.).
+
+Invoices/receipts are generated and sent via:
+
+Printed receipt.
+
+Email/SMS.

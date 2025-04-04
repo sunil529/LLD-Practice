@@ -1,0 +1,5 @@
+// Passenger Elevator (Specialization)
+public class PassengerElevator : Elevator
+{
+    public int MaxPassengers { get; set; } = 10;
+}

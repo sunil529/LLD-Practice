@@ -1,0 +1,7 @@
+// Machine Base Class
+public class Machine
+{
+    public string Manufacturer { get; set; }
+    public string ModelNumber { get; set; }
+    public bool IsOperational { get; set; } = true;
+}

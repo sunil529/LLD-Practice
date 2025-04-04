@@ -1,0 +1,5 @@
+// Freight Elevator (Specialization)
+public class FreightElevator : Elevator
+{
+    public int MaxWeightCapacity { get; set; } = 1000; // in kg
+}

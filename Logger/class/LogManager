@@ -1,0 +1,44 @@
+public class LogManager // Singleton class
+{
+    private static readonly LogManager instance = new LogManager(); // Singleton instance
+    private List<ILogger> loggers = new List<ILogger>(); // Stores all registered loggers
+    private readonly ConcurrentQueue<LogMessage> logQueue = new ConcurrentQueue<LogMessage>(); // Thread-safe log queue
+    private Thread logProcessorThread; // Separate thread for processing logs
+    private bool isRunning = true; // Controls logging process status
+
+    private LogManager()
+    {
+        logProcessorThread = new Thread(ProcessLogs); // Create a new thread for processing logs
+        logProcessorThread.Start(); // Start the log processing thread
+    }
+
+    public static LogManager Instance => instance; // Provides global access to LogManager instance
+
+    public void RegisterLogger(ILogger logger)
+    {
+        loggers.Add(logger); // Registering different types of loggers in the loggers list
+    }
+
+    public void Log(LogLevel level, string message)
+    {
+        LogMessage logMessage = new LogMessage(level, message, "Application");
+        logQueue.Enqueue(logMessage); // The log message is added to the queue for processing
+    }
+
+    private void ProcessLogs()
+    {
+        while (isRunning) // Runs continuously until stopped
+        {
+            if (logQueue.TryDequeue(out LogMessage logMessage)) // Fetch a log if available
+            {
+                foreach (var logger in loggers) // Send log to all registered loggers
+                {
+                    logger.Log(logMessage);
+                }
+            }
+            Thread.Sleep(50); // Pause briefly to prevent excessive CPU usage
+        }
+    }
+
+    public void StopProcessing() => isRunning = false; // Stops log processing gracefully
+}

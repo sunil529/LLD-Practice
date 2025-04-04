@@ -1,0 +1,4 @@
+public interface INotificationObserver
+{
+    void Notify(Transaction transaction);
+}

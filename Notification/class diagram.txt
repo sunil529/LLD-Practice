@@ -1,0 +1,119 @@
+Summary of Relationships
+Relationship	Type	Example
+User → Notification	Has-A	A User has multiple Notifications
+Notification → NotificationChannel	Has-A	A Notification has a delivery channel (Email, SMS)
+NotificationChannel → EmailNotification/SMSNotification	Is-A	EmailNotification is a NotificationChannel
+NotificationManager → Notification	Has-A (Aggregation)	NotificationManager has multiple Notifications
+Notification → Template	Has-A	A Notification has a Template
+
+Entities for Notification System
+For designing a scalable and extensible Notification System, we need to identify key entities based on the 
+functional and non-functional requirements.
+
+1. User
+Represents the recipient of the notification.
+
+Attributes:
+UserId (UUID) → Unique identifier
+
+Name (string) → User's name
+
+Email (string) → User's email address
+
+PhoneNumber (string) → User’s mobile number
+
+PreferredChannels (List<NotificationChannel>) → Channels user prefers (Email, SMS, Push, etc.)
+
+CreatedAt (timestamp) → When user was created
+
+UpdatedAt (timestamp) → When user preferences were last updated
+
+2. Notification
+Represents a single notification message.
+
+Attributes:
+NotificationId (UUID) → Unique identifier
+
+UserId (UUID) → User receiving the notification
+
+NotificationType (enum) → ORDER_UPDATE, SECURITY_ALERT, PROMOTIONAL
+
+Message (string) → The actual notification content
+
+Priority (enum) → HIGH, MEDIUM, LOW
+
+Status (enum) → PENDING, SENT, FAILED, RETRIED
+
+CreatedAt (timestamp) → When notification was created
+
+SentAt (timestamp) → When notification was sent
+
+3. NotificationChannel
+Represents different ways to send notifications (Email, SMS, Push, etc.).
+
+Attributes:
+ChannelId (UUID) → Unique identifier
+
+ChannelType (enum) → EMAIL, SMS, PUSH_NOTIFICATION, WEBHOOK
+
+Enabled (boolean) → If the channel is active
+
+RetryCount (int) → Number of retry attempts
+
+CreatedAt (timestamp)
+
+4. NotificationTemplate
+Stores pre-defined templates for various notification types.
+
+Attributes:
+TemplateId (UUID) → Unique identifier
+
+NotificationType (enum) → ORDER_UPDATE, SECURITY_ALERT, PROMOTIONAL
+
+Content (string) → Template body (with placeholders like {username}, {order_id})
+
+Format (enum) → TEXT, HTML, JSON
+
+CreatedAt (timestamp)
+
+5. NotificationLog
+Stores logs of notifications for debugging and analytics.
+
+Attributes:
+LogId (UUID) → Unique identifier
+
+NotificationId (UUID) → Links to Notification entity
+
+ChannelType (enum) → EMAIL, SMS, PUSH
+
+Status (enum) → SENT, FAILED, RETRIED
+
+FailureReason (string) → If failed, store reason
+
+LoggedAt (timestamp)
+
+6. RetryQueue
+Stores failed notifications for retrying later.
+
+Attributes:
+RetryId (UUID) → Unique identifier
+
+NotificationId (UUID) → Links to Notification entity
+
+RetryCount (int) → Number of times retried
+
+NextRetryAt (timestamp) → Scheduled retry time
+
+Status (enum) → PENDING, RETRYING, FAILED
+
+7. ThirdPartyProvider
+Represents external services like Twilio, Firebase, SES, etc.
+
+Attributes:
+ProviderId (UUID) → Unique identifier
+
+ProviderType (enum) → TWILIO, AWS_SES, FIREBASE
+
+APIKey (string) → API Key for integration
+
+Enabled (boolean) → If provider is active

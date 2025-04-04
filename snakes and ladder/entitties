@@ -1,0 +1,47 @@
+1️⃣ Board
+Represents the game board where players move.
+
+boardSize: int → Number of squares (default: 100).
+
+snakes: List<Snake> → List of snakes on the board.
+
+ladders: List<Ladder> → List of ladders on the board.
+
+2️⃣ Snake
+Moves the player down if landed on.
+
+start: int → Position of the snake’s head.
+
+end: int → Position of the snake’s tail.
+
+3️⃣ Ladder
+Moves the player up if landed on.
+
+start: int → Position of the ladder’s base.
+
+end: int → Position of the ladder’s top.
+
+4️⃣ Player
+Represents a player in the game.
+
+playerId: int → Unique ID of the player.
+
+name: string → Name of the player.
+
+position: int → Current position on the board.
+
+5️⃣ Dice
+Simulates rolling a dice.
+
+faces: int = 6 → Number of faces on the dice.
+
+6️⃣ Game
+Controls the game mechanics and manages turns.
+
+board: Board → The game board.
+
+players: Queue<Player> → Queue to manage turns.
+
+dice: Dice → The dice used for rolling.
+
+winner: Player? → Stores the winner of the game.

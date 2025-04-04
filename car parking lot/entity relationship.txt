@@ -1,0 +1,25 @@
+🔹 Entity Relationships Summary
+One ParkingLot → Has Many ParkingSlots
+
+One User → Has Many Vehicles
+
+One Vehicle → Can Have One Ticket at a time
+
+One Ticket → Belongs to One ParkingSlot
+
+One User → Can Have Multiple Reservations
+
+
+---------------------------------
+
+Vehicle (Has-A relationship with User)
+
+User (Owns a Vehicle)
+
+ParkingSlot (Tracks available/occupied slots)
+
+ParkingTicket (Links Vehicles to ParkingSlots)
+
+Payment (Handles transactions for parking fees)
+
+ParkingLotManager (Manages slots, tickets, and payments)

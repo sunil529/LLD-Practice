@@ -1,0 +1,24 @@
+Moving in the Elevator
+Elevator moves in the requested direction.
+
+Stops at intermediate floors if there are requests in the same direction.
+
+Elevator arrives at the destination floor, doors open.
+
+User exits, and the elevator continues to the next request.
+
+3️⃣ Handling Emergency
+User presses Emergency Stop inside the elevator.
+
+Elevator stops immediately.
+
+An alert is sent to the building monitoring system.
+
+Technician intervention is required.
+
+4️⃣ Maintenance Mode
+Technician sets the elevator to maintenance mode.
+
+The elevator stops accepting new requests.
+
+Passengers inside are moved to the nearest floor and asked to exit.
