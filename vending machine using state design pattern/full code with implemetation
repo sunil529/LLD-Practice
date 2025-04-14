@@ -1,0 +1,240 @@
+using System;
+using System.Collections.Generic;
+
+#region State Interface
+public interface IVendingState
+{
+    void InsertMoney(VendingMachine machine, decimal amount);
+    void SelectProduct(VendingMachine machine, string productName);
+    void Cancel(VendingMachine machine);
+    void Dispense(VendingMachine machine);
+}
+#endregion
+
+#region Context Class
+public class VendingMachine
+{
+    public IVendingState IdleState = new IdleState();
+    public IVendingState HasMoneyState = new HasMoneyState();
+    public IVendingState SelectionState = new SelectionState();
+    public IVendingState CancelRefundState = new CancelRefundState();
+    public IVendingState ProductDispenserState = new ProductDispenserState();
+
+    public IVendingState CurrentState { get; set; }
+    public decimal Balance { get; set; } = 0;
+    public string SelectedProduct { get; set; } = "";
+
+    public Dictionary<string, decimal> Products = new()
+    {
+        { "Coke", 25 },
+        { "Pepsi", 35 },
+        { "Chips", 45 }
+    };
+
+    public Dictionary<string, int> Inventory = new()
+    {
+        { "Coke", 5 },
+        { "Pepsi", 5 },
+        { "Chips", 0 } // Out of stock
+    };
+
+    public VendingMachine()
+    {
+        CurrentState = IdleState;
+    }
+
+    public void InsertMoney(decimal amount) => CurrentState.InsertMoney(this, amount);
+    public void SelectProduct(string name) => CurrentState.SelectProduct(this, name);
+    public void Cancel() => CurrentState.Cancel(this);
+    public void Dispense() => CurrentState.Dispense(this);
+}
+#endregion
+
+#region States
+
+public class IdleState : IVendingState
+{
+    public void InsertMoney(VendingMachine machine, decimal amount)
+    {
+        machine.Balance += amount;
+        Console.WriteLine($"Inserted ₹{amount}. Current Balance: ₹{machine.Balance}");
+        machine.CurrentState = machine.HasMoneyState;
+    }
+
+    public void SelectProduct(VendingMachine machine, string productName)
+    {
+        Console.WriteLine("Insert money first.");
+    }
+
+    public void Cancel(VendingMachine machine)
+    {
+        Console.WriteLine("No money to refund.");
+    }
+
+    public void Dispense(VendingMachine machine)
+    {
+        Console.WriteLine("No product to dispense.");
+    }
+}
+
+public class HasMoneyState : IVendingState
+{
+    public void InsertMoney(VendingMachine machine, decimal amount)
+    {
+        machine.Balance += amount;
+        Console.WriteLine($"Inserted additional ₹{amount}. Total Balance: ₹{machine.Balance}");
+    }
+
+    public void SelectProduct(VendingMachine machine, string productName)
+    {
+        if (!machine.Products.ContainsKey(productName))
+        {
+            Console.WriteLine("Invalid product.");
+            return;
+        }
+
+        if (machine.Inventory[productName] <= 0)
+        {
+            Console.WriteLine("Product out of stock.");
+            return;
+        }
+
+        decimal price = machine.Products[productName];
+        if (machine.Balance >= price)
+        {
+            machine.SelectedProduct = productName;
+            Console.WriteLine($"Product '{productName}' selected.");
+            machine.CurrentState = machine.SelectionState;
+        }
+        else
+        {
+            Console.WriteLine($"Insufficient balance for {productName}.");
+        }
+    }
+
+    public void Cancel(VendingMachine machine)
+    {
+        machine.CurrentState = machine.CancelRefundState;
+        machine.Cancel(); // Delegate to CancelRefundState
+    }
+
+    public void Dispense(VendingMachine machine)
+    {
+        Console.WriteLine("Select a product first.");
+    }
+}
+
+public class SelectionState : IVendingState
+{
+    public void InsertMoney(VendingMachine machine, decimal amount)
+    {
+        Console.WriteLine("Already selected product. Dispensing soon.");
+    }
+
+    public void SelectProduct(VendingMachine machine, string productName)
+    {
+        Console.WriteLine("Already selected a product.");
+    }
+
+    public void Cancel(VendingMachine machine)
+    {
+        machine.CurrentState = machine.CancelRefundState;
+        machine.Cancel();
+    }
+
+    public void Dispense(VendingMachine machine)
+    {
+        machine.CurrentState = machine.ProductDispenserState;
+        machine.Dispense(); // Delegate to ProductDispenserState
+    }
+}
+
+public class CancelRefundState : IVendingState
+{
+    public void InsertMoney(VendingMachine machine, decimal amount)
+    {
+        Console.WriteLine("Refunding... Please wait.");
+    }
+
+    public void SelectProduct(VendingMachine machine, string productName)
+    {
+        Console.WriteLine("Refunding. Cannot select product.");
+    }
+
+    public void Cancel(VendingMachine machine)
+    {
+        Console.WriteLine($"Refunding ₹{machine.Balance}");
+        machine.Balance = 0;
+        machine.SelectedProduct = "";
+        machine.CurrentState = machine.IdleState;
+    }
+
+    public void Dispense(VendingMachine machine)
+    {
+        Console.WriteLine("Transaction cancelled. Nothing to dispense.");
+    }
+}
+
+public class ProductDispenserState : IVendingState
+{
+    public void InsertMoney(VendingMachine machine, decimal amount)
+    {
+        Console.WriteLine("Dispensing in progress. Try after it's done.");
+    }
+
+    public void SelectProduct(VendingMachine machine, string productName)
+    {
+        Console.WriteLine("Already dispensing product.");
+    }
+
+    public void Cancel(VendingMachine machine)
+    {
+        Console.WriteLine("Cannot cancel after product is selected.");
+    }
+
+    public void Dispense(VendingMachine machine)
+    {
+        string product = machine.SelectedProduct;
+        decimal price = machine.Products[product];
+        machine.Balance -= price;
+        machine.Inventory[product]--;
+
+        Console.WriteLine($"Dispensing '{product}'... Remaining Balance: ₹{machine.Balance}");
+
+        // Reset machine state
+        machine.SelectedProduct = "";
+        if (machine.Balance > 0)
+        {
+            Console.WriteLine($"Returning remaining balance: ₹{machine.Balance}");
+            machine.Balance = 0;
+        }
+
+        machine.CurrentState = machine.IdleState;
+    }
+}
+#endregion
+
+#region Test Example
+
+public class Program
+{
+    public static void Main()
+    {
+        VendingMachine vm = new VendingMachine();
+
+        Console.WriteLine("--- Vending Machine Simulation ---\n");
+
+        vm.InsertMoney(50);
+        vm.SelectProduct("Coke");
+        vm.Dispense();
+
+        Console.WriteLine("\n--- Try Buying Out of Stock ---\n");
+        vm.InsertMoney(50);
+        vm.SelectProduct("Chips");
+
+        Console.WriteLine("\n--- Cancel Transaction ---\n");
+        vm.InsertMoney(30);
+        vm.Cancel();
+    }
+}
+#endregion

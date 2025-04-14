@@ -1,0 +1,16 @@
+ User Journeys
+Create Directory
+
+A user can create a directory and optionally nest other directories or files inside it.
+
+Add File to Directory
+
+A user adds a file under a directory.
+
+Add Subdirectory to Directory
+
+A user can add another directory inside an existing directory, supporting nesting.
+
+List Contents
+
+A user can invoke Ls() on a directory to recursively list all files and directories within it.

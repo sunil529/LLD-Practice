@@ -1,0 +1,5 @@
+Entities in the System
+Entity	Description
+IFileSystem	Common interface for both File and Directory (supports Ls() method).
+File	Represents a leaf node in the file system hierarchy. Implements Ls() to print file name.
+Directory	Composite node that contains a list of IFileSystem (files or subdirectories). Implements Ls() recursively.

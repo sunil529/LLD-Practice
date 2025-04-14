@@ -1,0 +1,33 @@
+Entity Relationships
+A VendingMachine has many Products
+
+A VendingMachine has many Transactions
+
+A Transaction is linked to a Product
+
+A StateLog records each state transition of the machine
+
+1. VendingMachine
+Attribute	Type	Description
+id	UUID / INT	Unique machine ID
+location	VARCHAR	Physical location
+current_state	VARCHAR	Current state name (e.g., Idle, HasMoney)
+balance	DECIMAL	Current inserted money
+last_updated	TIMESTAMP	For audit/troubleshooting
+2. Product
+Attribute	Type	Description
+id	UUID / INT	Unique product ID
+name	VARCHAR	e.g., Coke, Chips
+price	DECIMAL	Product price
+quantity	INT	Remaining stock
+machine_id	UUID / FK	Linked to VendingMachine
+3. Transaction
+Attribute	Type	Description
+id	UUID / INT	Transaction ID
+machine_id	UUID / FK	Associated vending machine
+product_id	UUID / FK	Product selected
+amount_inserted	DECIMAL	Total inserted money
+product_price	DECIMAL	Price of the product
+refund_amount	DECIMAL	Money refunded (if any)
+status	VARCHAR	success, cancelled, insufficient_funds
+created_at	TIMESTAMP	Transaction timestamp

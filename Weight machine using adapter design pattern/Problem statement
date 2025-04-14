@@ -1,0 +1,1 @@
+You have a third-party weight machine (e.g., from the US), which returns weight in pounds, but your application expects weight in kilograms. You can’t change the third-party class, but you want to use it seamlessly in your system.

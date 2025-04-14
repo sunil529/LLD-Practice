@@ -1,0 +1,48 @@
+//target interface our app expects this
+public interface IWeightMachine
+{
+    double GetWeightInKg();
+}
+
+//adaptee third party or legacy 
+public class WeightMachineInPounds
+{
+    public double GetWeightInPounds()
+    {
+        // Let's assume this is coming from a third-party library
+        return 220.5;
+    }
+}
+
+//adapter bridge compatible interface
+public class WeightMachineAdapter : IWeightMachine
+{
+    private readonly WeightMachineInPounds _weightMachineInPounds;
+
+    public WeightMachineAdapter(WeightMachineInPounds weightMachine)
+    {
+        _weightMachineInPounds = weightMachine;
+    }
+
+    public double GetWeightInKg()
+    {
+        double weightInPounds = _weightMachineInPounds.GetWeightInPounds();
+        return ConvertPoundsToKg(weightInPounds);
+    }
+
+    private double ConvertPoundsToKg(double pounds)
+    {
+        return pounds * 0.453592;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        WeightMachineInPounds legacyMachine = new WeightMachineInPounds();
+        IWeightMachine adapter = new WeightMachineAdapter(legacyMachine);
+
+        Console.WriteLine("Weight in KG: " + adapter.GetWeightInKg());
+    }
+}

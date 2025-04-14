@@ -1,0 +1,97 @@
+1. Successful Withdrawal (Happy Path)
+👣 Steps:
+User inserts card → IdleState → HasCardState
+
+Enters correct PIN → HasCardState → AuthenticationState
+
+Authenticated → AuthenticationState → OperationState
+
+Selects withdrawal option → OperationState → PerformOperationState
+
+Withdraws amount → balance updated
+
+Card is ejected → PerformOperationState → IdleState
+
+✅ 2. Balance Inquiry
+👣 Steps:
+Insert card
+
+Enter PIN
+
+Authenticate
+
+Select “Check Balance”
+
+Show balance
+
+Eject card and return to idle
+
+✅ 3. Cash Deposit
+👣 Steps:
+Insert card
+
+Enter PIN
+
+Authenticate
+
+Select “Deposit”
+
+Deposit ₹1000 → Balance increased
+
+Card ejected
+
+✅ 4. PIN Change
+👣 Steps:
+Insert card
+
+Enter correct PIN
+
+Authenticate
+
+Select “Change PIN”
+
+New PIN updated (mocked)
+
+Return card and go to idle
+
+❌ 5. Invalid PIN (Authentication Failure)
+👣 Steps:
+Insert card
+
+Enter incorrect PIN
+
+Authentication fails
+
+Card is ejected automatically
+
+Return to idle
+
+❌ 6. Cancel at Any Stage
+👣 Example: Cancel after entering card
+Insert card
+
+Click cancel
+
+Refund initiated (if any pending action)
+
+Card ejected → return to idle
+
+👣 Example: Cancel after authentication
+Insert card
+
+Enter PIN
+
+Authenticate
+
+Click cancel instead of selecting operation
+
+Card ejected
+
+[Idle] 
+  └── InsertCard → [HasCard] 
+      └── EnterPIN → [Authentication]
+          └── Authenticate → [Operation]
+              └── SelectOption → [PerformOperation]
+                  └── Done → EjectCard → [Idle]
+
+Any point → Cancel → EjectCard → [Idle]

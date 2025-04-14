@@ -1,0 +1,73 @@
+using System;
+using System.Collections.Generic;
+
+namespace FileSystemCompositePattern
+{
+    // Component
+    public interface IFileSystem
+    {
+        void Ls();
+    }
+
+    // Leaf
+    public class File : IFileSystem
+    {
+        private string _fileName;
+
+        public File(string fileName)
+        {
+            _fileName = fileName;
+        }
+
+        public void Ls()
+        {
+            Console.WriteLine("File name: " + _fileName);
+        }
+    }
+
+    // Composite
+    public class Directory : IFileSystem
+    {
+        private string _directoryName;
+        private List<IFileSystem> _fileSystemList = new List<IFileSystem>();
+
+        public Directory(string directoryName)
+        {
+            _directoryName = directoryName;
+        }
+
+        public void Add(IFileSystem fileSystem)
+        {
+            _fileSystemList.Add(fileSystem);
+        }
+
+        public void Ls()
+        {
+            Console.WriteLine("Directory name: " + _directoryName);
+            foreach (var fileSystem in _fileSystemList)
+            {
+                fileSystem.Ls();
+            }
+        }
+    }
+
+    // Client
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Directory movieDirectory = new Directory("Movie");
+
+            File border = new File("Border");
+            movieDirectory.Add(border);
+
+            Directory comedyMovieDirectory = new Directory("ComedyMovie");
+            File hulchul = new File("Hulchul");
+            comedyMovieDirectory.Add(hulchul);
+
+            movieDirectory.Add(comedyMovieDirectory);
+
+            movieDirectory.Ls();
+        }
+    }
+}

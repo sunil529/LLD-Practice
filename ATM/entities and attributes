@@ -1,0 +1,20 @@
+Entities and Attributes
+1. ATMContext (State Machine)
+CurrentState: current state instance
+
+EnteredPin: user input pin
+
+CurrentUser: reference to active user session
+
+2. UserSession (Mocked User)
+AccountNumber: user ID
+
+Pin: current PIN
+
+Balance: current balance
+
+UserName: display name
+
+3. OperationHandler (Chain of Responsibility)
+Abstract base for operation types: balance check, withdraw, deposit, PIN change
+

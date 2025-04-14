@@ -1,0 +1,7 @@
+give me an lld implemetation of ATM using state desing patterna + chain of responsibility design pattern the  flow is like this 
+idle state - operation insert card
+has card state- ask for pin
+authentication state - authenticate user
+operation state- give the user choice of the operation
+perform operation state -cash deposit,cash withdrwal,check balance,pin change etc.
+after this the system should returns to the idle state returning the card to the user also one cancel state should be there as well

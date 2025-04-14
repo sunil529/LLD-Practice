@@ -1,0 +1,273 @@
+// State interface
+public interface IATMState
+{
+    void InsertCard(ATMContext context);
+    void EnterPin(ATMContext context, string pin);
+    void Authenticate(ATMContext context);
+    void SelectOperation(ATMContext context);
+    void PerformOperation(ATMContext context);
+    void Cancel(ATMContext context);
+    void EjectCard(ATMContext context);
+}
+
+// Context class
+public class ATMContext
+{
+    public IATMState IdleState = new IdleState();
+    public IATMState HasCardState = new HasCardState();
+    public IATMState AuthState = new AuthenticationState();
+    public IATMState OperationState = new OperationSelectionState();
+    public IATMState PerformOperationState = new PerformOperationState();
+    public IATMState CancelState = new CancelState();
+
+    public IATMState CurrentState { get; set; }
+    public string EnteredPin { get; set; }
+    public UserSession CurrentUser { get; set; }
+
+    public ATMContext()
+    {
+        CurrentState = IdleState;
+    }
+
+    public void InsertCard() => CurrentState.InsertCard(this);
+    public void EnterPin(string pin) => CurrentState.EnterPin(this, pin);
+    public void Authenticate() => CurrentState.Authenticate(this);
+    public void SelectOperation() => CurrentState.SelectOperation(this);
+    public void PerformOperation() => CurrentState.PerformOperation(this);
+    public void Cancel() => CurrentState.Cancel(this);
+    public void EjectCard() => CurrentState.EjectCard(this);
+}
+
+// Entity: UserSession (Mocked user data)
+public class UserSession
+{
+    public string AccountNumber { get; set; } = "1234567890";
+    public string Pin { get; set; } = "1234";
+    public decimal Balance { get; set; } = 10000;
+    public string UserName { get; set; } = "John Doe";
+}
+
+// State: Idle
+public class IdleState : IATMState
+{
+    public void InsertCard(ATMContext context)
+    {
+        Console.WriteLine("Card inserted.");
+        context.CurrentState = context.HasCardState;
+    }
+
+    public void EnterPin(ATMContext context, string pin) => Console.WriteLine("Insert card first.");
+    public void Authenticate(ATMContext context) => Console.WriteLine("Insert card and enter PIN first.");
+    public void SelectOperation(ATMContext context) => Console.WriteLine("Not authenticated yet.");
+    public void PerformOperation(ATMContext context) => Console.WriteLine("Not authenticated yet.");
+    public void Cancel(ATMContext context) => Console.WriteLine("No operation to cancel.");
+    public void EjectCard(ATMContext context) => Console.WriteLine("No card inserted.");
+}
+
+// State: HasCard
+public class HasCardState : IATMState
+{
+    public void InsertCard(ATMContext context) => Console.WriteLine("Card already inserted.");
+
+    public void EnterPin(ATMContext context, string pin)
+    {
+        context.EnteredPin = pin;
+        context.CurrentState = context.AuthState;
+        Console.WriteLine("PIN entered.");
+    }
+
+    public void Authenticate(ATMContext context) => Console.WriteLine("Enter PIN first.");
+    public void SelectOperation(ATMContext context) => Console.WriteLine("Authenticate first.");
+    public void PerformOperation(ATMContext context) => Console.WriteLine("Authenticate first.");
+    public void Cancel(ATMContext context)
+    {
+        Console.WriteLine("Cancelling... Card ejected.");
+        context.CurrentState = context.IdleState;
+    }
+
+    public void EjectCard(ATMContext context)
+    {
+        Console.WriteLine("Card ejected.");
+        context.CurrentState = context.IdleState;
+    }
+}
+
+// State: Authentication
+public class AuthenticationState : IATMState
+{
+    public void InsertCard(ATMContext context) => Console.WriteLine("Already in progress.");
+    public void EnterPin(ATMContext context, string pin) => Console.WriteLine("PIN already entered.");
+
+    public void Authenticate(ATMContext context)
+    {
+        context.CurrentUser = new UserSession();
+        if (context.EnteredPin == context.CurrentUser.Pin)
+        {
+            Console.WriteLine("Authentication successful.");
+            context.CurrentState = context.OperationState;
+        }
+        else
+        {
+            Console.WriteLine("Invalid PIN. Card ejected.");
+            context.CurrentState = context.IdleState;
+        }
+    }
+
+    public void SelectOperation(ATMContext context) => Console.WriteLine("Authenticate first.");
+    public void PerformOperation(ATMContext context) => Console.WriteLine("Authenticate first.");
+    public void Cancel(ATMContext context)
+    {
+        Console.WriteLine("Cancelling and ejecting card.");
+        context.CurrentState = context.IdleState;
+    }
+    public void EjectCard(ATMContext context)
+    {
+        Console.WriteLine("Card ejected.");
+        context.CurrentState = context.IdleState;
+    }
+}
+
+// State: Operation Selection
+public class OperationSelectionState : IATMState
+{
+    public void InsertCard(ATMContext context) => Console.WriteLine("Already inserted.");
+    public void EnterPin(ATMContext context, string pin) => Console.WriteLine("Already authenticated.");
+    public void Authenticate(ATMContext context) => Console.WriteLine("Already authenticated.");
+
+    public void SelectOperation(ATMContext context)
+    {
+        Console.WriteLine("Select Operation: 1. Balance  2. Withdraw  3. Deposit  4. Change PIN");
+        context.CurrentState = context.PerformOperationState;
+    }
+
+    public void PerformOperation(ATMContext context) => Console.WriteLine("Select operation first.");
+    public void Cancel(ATMContext context)
+    {
+        Console.WriteLine("Cancelling and ejecting card.");
+        context.CurrentState = context.IdleState;
+    }
+    public void EjectCard(ATMContext context)
+    {
+        Console.WriteLine("Card ejected.");
+        context.CurrentState = context.IdleState;
+    }
+}
+
+// Chain of Responsibility Handlers
+public abstract class OperationHandler
+{
+    protected OperationHandler next;
+
+    public void SetNext(OperationHandler nextHandler) => next = nextHandler;
+    public abstract void Handle(string request, ATMContext context);
+}
+
+public class BalanceCheckHandler : OperationHandler
+{
+    public override void Handle(string request, ATMContext context)
+    {
+        if (request == "1")
+            Console.WriteLine($"Your balance is: ₹{context.CurrentUser.Balance}");
+        else
+            next?.Handle(request, context);
+    }
+}
+
+public class WithdrawalHandler : OperationHandler
+{
+    public override void Handle(string request, ATMContext context)
+    {
+        if (request == "2")
+        {
+            Console.WriteLine("Withdrawing ₹1000");
+            context.CurrentUser.Balance -= 1000;
+        }
+        else
+            next?.Handle(request, context);
+    }
+}
+
+public class DepositHandler : OperationHandler
+{
+    public override void Handle(string request, ATMContext context)
+    {
+        if (request == "3")
+        {
+            Console.WriteLine("Depositing ₹1000");
+            context.CurrentUser.Balance += 1000;
+        }
+        else
+            next?.Handle(request, context);
+    }
+}
+
+public class PinChangeHandler : OperationHandler
+{
+    public override void Handle(string request, ATMContext context)
+    {
+        if (request == "4")
+        {
+            Console.WriteLine("Changing PIN to 9999");
+            context.CurrentUser.Pin = "9999";
+        }
+        else
+            Console.WriteLine("Invalid Operation");
+    }
+}
+
+// State: Perform Operation
+public class PerformOperationState : IATMState
+{
+    public void InsertCard(ATMContext context) => Console.WriteLine("Already in process.");
+    public void EnterPin(ATMContext context, string pin) => Console.WriteLine("Already in process.");
+    public void Authenticate(ATMContext context) => Console.WriteLine("Already in process.");
+    public void SelectOperation(ATMContext context) => Console.WriteLine("Already in process.");
+
+    public void PerformOperation(ATMContext context)
+    {
+        Console.Write("Enter option: ");
+        string input = Console.ReadLine();
+
+        var balance = new BalanceCheckHandler();
+        var withdraw = new WithdrawalHandler();
+        var deposit = new DepositHandler();
+        var pinChange = new PinChangeHandler();
+
+        balance.SetNext(withdraw);
+        withdraw.SetNext(deposit);
+        deposit.SetNext(pinChange);
+
+        balance.Handle(input, context);
+
+        Console.WriteLine("Returning card...");
+        context.CurrentState = context.IdleState;
+    }
+
+    public void Cancel(ATMContext context)
+    {
+        Console.WriteLine("Transaction cancelled. Returning card.");
+        context.CurrentState = context.IdleState;
+    }
+
+    public void EjectCard(ATMContext context)
+    {
+        Console.WriteLine("Card ejected.");
+        context.CurrentState = context.IdleState;
+    }
+}
+
+// Demo Program
+public class Program
+{
+    public static void Main()
+    {
+        var atm = new ATMContext();
+        Console.WriteLine("=== ATM State Machine Simulation ===\n");
+
+        atm.InsertCard();
+        atm.EnterPin("1234");
+        atm.Authenticate();
+        atm.SelectOperation();
+        atm.PerformOperation();
+    }
+}
