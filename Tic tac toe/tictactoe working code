@@ -1,0 +1,221 @@
+using System;
+using System.Collections.Generic;
+
+public enum PieceType
+{
+    X,
+    O
+}
+
+public class PlayingPiece
+{
+    public PieceType PieceType { get; private set; }
+
+    public PlayingPiece(PieceType pieceType)
+    {
+        PieceType = pieceType;
+    }
+}
+
+public class PlayingPieceX : PlayingPiece
+{
+    public PlayingPieceX() : base(PieceType.X)
+    {
+    }
+}
+
+public class PlayingPieceO : PlayingPiece
+{
+    public PlayingPieceO() : base(PieceType.O)
+    {
+    }
+}
+
+public class Board
+{
+    public int Size { get; private set; }
+    public PlayingPiece[,] GameBoard { get; private set; }
+
+    public Board(int size)
+    {
+        Size = size;
+        GameBoard = new PlayingPiece[size, size];
+    }
+
+    public bool AddPiece(int row, int column, PlayingPiece playingPiece)
+    {
+        if (GameBoard[row, column] != null)
+        {
+            return false;
+        }
+        GameBoard[row, column] = playingPiece;
+        return true;
+    }
+
+    public List<(int, int)> GetFreeCells()
+    {
+        var freeCells = new List<(int, int)>();
+        for (int i = 0; i < Size; i++)
+        {
+            for (int j = 0; j < Size; j++)
+            {
+                if (GameBoard[i, j] == null)
+                {
+                    freeCells.Add((i, j));
+                }
+            }
+        }
+        return freeCells;
+    }
+
+    public void PrintBoard()
+    {
+        for (int i = 0; i < Size; i++)
+        {
+            for (int j = 0; j < Size; j++)
+            {
+                if (GameBoard[i, j] != null)
+                {
+                    Console.Write(GameBoard[i, j].PieceType.ToString() + " ");
+                }
+                else
+                {
+                    Console.Write("  ");
+                }
+                Console.Write("| ");
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+public class Player
+{
+    public string Name { get; private set; }
+    public PlayingPiece PlayingPiece { get; private set; }
+
+    public Player(string name, PlayingPiece playingPiece)
+    {
+        Name = name;
+        PlayingPiece = playingPiece;
+    }
+}
+
+public class Game
+{
+    private Queue<Player> players;
+    private Board gameBoard;
+
+    public Game()
+    {
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        players = new Queue<Player>();
+
+        var cross = new PlayingPieceX();
+        var player1 = new Player("Sunil", cross);
+
+        var dot = new PlayingPieceO();
+        var player2 = new Player("XYZ", dot);
+
+        players.Enqueue(player1);
+        players.Enqueue(player2);
+
+        gameBoard = new Board(3);
+    }
+
+    public string StartGame()
+    {
+        bool noWinner = true;
+
+        while (noWinner)
+        {
+            Player playerTurn = players.Dequeue();
+
+            gameBoard.PrintBoard();
+
+            var freeSpaces = gameBoard.GetFreeCells();
+            if (freeSpaces.Count == 0)
+            {
+                noWinner = false;
+                continue;
+            }
+
+            Console.Write($"Player: {playerTurn.Name}, enter row,column: ");
+            string s = Console.ReadLine();
+            var values = s.Split(',');
+
+            int inputRow = int.Parse(values[0]);
+            int inputColumn = int.Parse(values[1]);
+
+            bool pieceAddedSuccessfully = gameBoard.AddPiece(inputRow, inputColumn, playerTurn.PlayingPiece);
+            if (!pieceAddedSuccessfully)
+            {
+                Console.WriteLine("Incorrect position chosen, try again!");
+                players.Enqueue(playerTurn);
+                continue;
+            }
+
+            players.Enqueue(playerTurn);
+
+            bool winner = IsThereWinner(inputRow, inputColumn, playerTurn.PlayingPiece.PieceType);
+            if (winner)
+            {
+                return playerTurn.Name;
+            }
+        }
+
+        return "Tie";
+    }
+
+    private bool IsThereWinner(int row, int column, PieceType pieceType)
+    {
+        bool rowMatch = true, columnMatch = true, diagonalMatch = true, antiDiagonalMatch = true;
+
+        for (int i = 0; i < gameBoard.Size; i++)
+        {
+            if (gameBoard.GameBoard[row, i] == null || gameBoard.GameBoard[row, i].PieceType != pieceType)
+            {
+                rowMatch = false;
+            }
+        }
+
+        for (int i = 0; i < gameBoard.Size; i++)
+        {
+            if (gameBoard.GameBoard[i, column] == null || gameBoard.GameBoard[i, column].PieceType != pieceType)
+            {
+                columnMatch = false;
+            }
+        }
+
+        for (int i = 0, j = 0; i < gameBoard.Size; i++, j++)
+        {
+            if (gameBoard.GameBoard[i, j] == null || gameBoard.GameBoard[i, j].PieceType != pieceType)
+            {
+                diagonalMatch = false;
+            }
+        }
+
+        for (int i = 0, j = gameBoard.Size - 1; i < gameBoard.Size; i++, j--)
+        {
+            if (gameBoard.GameBoard[i, j] == null || gameBoard.GameBoard[i, j].PieceType != pieceType)
+            {
+                antiDiagonalMatch = false;
+            }
+        }
+
+        return rowMatch || columnMatch || diagonalMatch || antiDiagonalMatch;
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Game game = new Game();
+        Console.WriteLine("Winner is: " + game.StartGame());
+    }
+}
