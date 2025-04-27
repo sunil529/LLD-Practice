@@ -1,0 +1,529 @@
+public class ParkingSpot{
+    int id;
+    bool isempty;
+    Vehichle vehicle;
+    int price;
+    parkVehicle(vehicle);
+    RemoveVehicle();
+}
+
+public class TwoWheelerspot:ParkingSpot
+{
+    price=10;
+}
+public class fourwheelerspot:ParkingSpot
+{
+    price=20;
+}
+
+public class ParkingSpotManager
+{
+    List<ParkingSpot> parkingspotlist;
+    public ParkingSpotManager(List<ParkingSpot>parkingspotlist)
+    {
+        this.parkingspotlist=parkingspotlist;
+    }
+    findParkingSpace();
+    AddParkingSpace();
+    removeParkingSpace();
+    ParkVehicle(vehicle);
+}
+public Interface IParkingStrategy{
+    findparkingspace();
+}
+public class neartoentrace:IParkingStrategy
+{
+    findparkingspace();
+}
+public class neartoelevator:IParkingStrategy
+{
+    findparkingspace();
+}
+
+public class TwoWheelerManager:ParkingSpotManager
+{
+    list<ParkingSpot>list=new List<ParkingSpot>()
+    {
+        600;
+    }
+    
+    public twowheelermanager():base(neartotentrace())
+    {
+        
+    }
+}
+
+public class fourwheelermanager:ParkingSpotManager{
+    list<ParkingSpot>list=new list<ParkingSpot>(
+        {
+            400;
+        }
+        public fourwheelermanager():base(neartoelevator())
+        {
+
+        }
+    )
+}
+
+public class ParkingSpotFactory{
+    ParkingSpotManager parkingspotmanager(vehicle);
+    vehicle vehicle;
+
+}
+public enum VehicleType{
+    Bike,
+    Car
+}
+
+public class vehicle{
+    int vehiclenumber;
+    VehicleType vtype;
+}
+public class Ticket
+{
+    datetime enttrytime;
+    long ticketId;
+    Vehicle vehicle;
+    parkingslot slot;
+}
+
+public class entranceGate{
+    ParkingSpotFactory parkingspotfactory;
+    ParkingSpotManager parkingspotmanager;
+    Ticket ticket;
+    findParkingSpace(vehicletype)
+    BookSpot(vehicle);
+    Generatetiecket(vehicle,parkingspot);
+}
+public class ExitGate{
+    ParkingSpotFactory parkingspotfactory;
+    ParkingSpotManager parkingspotmanager;
+    CostComutational Cost;
+    IpaymentStrategy payment;
+    PriceCal();
+    Payment();
+    removeVehicle();
+}
+
+ public CostComutationalFactory{
+    pricecal()
+    {
+        obj.price()
+    }
+ } 
+ public class 2wheelercostcomputational{
+    public 2wheelercostcomputational():base(HourlyPricignstrategy)
+    {
+
+    }
+ }
+ public class 4wheelercostcomputational{
+    public 4wheelercostcomputational():base(minutepricingstrategy)
+    {
+
+    }
+ }
+ public interface IPricingStrategy{
+    Price(ticket)
+    {
+        return price;
+    }
+ }
+
+ public class HourlyPricignstrategy:Ipricignstrategy
+ {
+    price(ticket)
+    {
+        return hours*ps.price();
+    }
+ }
+ public class minutepricingstrategy:IPricingStrategy
+ {
+    price(ticket)
+    {
+        return minutes*ps.price;
+    }
+ }
+ public interface IpaymentStrategy
+ {
+    paymetn();
+
+ }
+
+ public class cashpaymentstrategy:IpaymentStrategy
+ {
+    payment()
+    {
+        console.writelne("payment done by cash");
+    }
+ }
+ public class cardpaymentstrategy:IpaymentStrategy
+ {
+    payment()
+    {
+        console.writelne("payment done by card");
+    }
+ }
+
+ --------------------------------------------------------------------------------------------------------------------------------------
+ using System;
+using System.Collections.Generic;
+
+// Vehicle and VehicleType
+public enum VehicleType
+{
+    Bike,
+    Car
+}
+
+public class Vehicle
+{
+    public int VehicleNumber { get; set; }
+    public VehicleType VType { get; set; }
+
+    public Vehicle(int number, VehicleType type)
+    {
+        VehicleNumber = number;
+        VType = type;
+    }
+}
+
+// Parking Spot
+public class ParkingSpot
+{
+    public int Id { get; set; }
+    public bool IsEmpty { get; set; } = true;
+    public Vehicle Vehicle { get; set; }
+    public int Price { get; set; }
+
+    public ParkingSpot(int id, int price)
+    {
+        Id = id;
+        Price = price;
+    }
+
+    public virtual bool ParkVehicle(Vehicle vehicle)
+    {
+        if (IsEmpty)
+        {
+            this.Vehicle = vehicle;
+            this.IsEmpty = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void RemoveVehicle()
+    {
+        this.Vehicle = null;
+        this.IsEmpty = true;
+    }
+}
+
+public class TwoWheelerSpot : ParkingSpot
+{
+    public TwoWheelerSpot(int id) : base(id, 10) { }
+}
+
+public class FourWheelerSpot : ParkingSpot
+{
+    public FourWheelerSpot(int id) : base(id, 20) { }
+}
+
+// Parking Spot Manager
+public class ParkingSpotManager
+{
+    protected List<ParkingSpot> parkingSpotList;
+
+    public ParkingSpotManager(List<ParkingSpot> spots)
+    {
+        parkingSpotList = spots;
+    }
+
+    public virtual ParkingSpot FindParkingSpace()
+    {
+        foreach (var spot in parkingSpotList)
+        {
+            if (spot.IsEmpty)
+                return spot;
+        }
+        return null;
+    }
+
+    public void AddParkingSpace(ParkingSpot spot)
+    {
+        parkingSpotList.Add(spot);
+    }
+
+    public void RemoveParkingSpace(ParkingSpot spot)
+    {
+        parkingSpotList.Remove(spot);
+    }
+
+    public bool ParkVehicle(Vehicle vehicle)
+    {
+        var spot = FindParkingSpace();
+        if (spot != null)
+        {
+            return spot.ParkVehicle(vehicle);
+        }
+        return false;
+    }
+}
+
+// Parking Strategy Interface
+public interface IParkingStrategy
+{
+    ParkingSpot FindParkingSpace(List<ParkingSpot> spots);
+}
+
+// Near to entrance strategy
+public class NearToEntrance : IParkingStrategy
+{
+    public ParkingSpot FindParkingSpace(List<ParkingSpot> spots)
+    {
+        foreach (var spot in spots)
+        {
+            if (spot.IsEmpty)
+                return spot;
+        }
+        return null;
+    }
+}
+
+// Near to elevator strategy
+public class NearToElevator : IParkingStrategy
+{
+    public ParkingSpot FindParkingSpace(List<ParkingSpot> spots)
+    {
+        foreach (var spot in spots)
+        {
+            if (spot.IsEmpty)
+                return spot;
+        }
+        return null;
+    }
+}
+
+// Specialized Managers
+public class TwoWheelerManager : ParkingSpotManager
+{
+    private IParkingStrategy parkingStrategy;
+
+    public TwoWheelerManager(IParkingStrategy strategy) : base(new List<ParkingSpot>())
+    {
+        this.parkingStrategy = strategy;
+
+        // Add some two-wheeler spots
+        for (int i = 0; i < 5; i++)
+            AddParkingSpace(new TwoWheelerSpot(600 + i));
+    }
+
+    public override ParkingSpot FindParkingSpace()
+    {
+        return parkingStrategy.FindParkingSpace(parkingSpotList);
+    }
+}
+
+public class FourWheelerManager : ParkingSpotManager
+{
+    private IParkingStrategy parkingStrategy;
+
+    public FourWheelerManager(IParkingStrategy strategy) : base(new List<ParkingSpot>())
+    {
+        this.parkingStrategy = strategy;
+
+        // Add some four-wheeler spots
+        for (int i = 0; i < 5; i++)
+            AddParkingSpace(new FourWheelerSpot(400 + i));
+    }
+
+    public override ParkingSpot FindParkingSpace()
+    {
+        return parkingStrategy.FindParkingSpace(parkingSpotList);
+    }
+}
+
+// Parking Spot Factory
+public class ParkingSpotFactory
+{
+    public ParkingSpotManager GetParkingSpotManager(VehicleType type)
+    {
+        if (type == VehicleType.Bike)
+        {
+            return new TwoWheelerManager(new NearToEntrance());
+        }
+        else
+        {
+            return new FourWheelerManager(new NearToElevator());
+        }
+    }
+}
+
+// Ticket
+public class Ticket
+{
+    public DateTime EntryTime { get; set; }
+    public long TicketId { get; set; }
+    public Vehicle Vehicle { get; set; }
+    public ParkingSpot Spot { get; set; }
+
+    public Ticket(Vehicle vehicle, ParkingSpot spot)
+    {
+        EntryTime = DateTime.Now;
+        TicketId = DateTime.Now.Ticks;
+        Vehicle = vehicle;
+        Spot = spot;
+    }
+}
+
+// Entrance Gate
+public class EntranceGate
+{
+    private ParkingSpotFactory factory = new ParkingSpotFactory();
+    private Ticket ticket;
+
+    public Ticket BookSpot(Vehicle vehicle)
+    {
+        var manager = factory.GetParkingSpotManager(vehicle.VType);
+        var spot = manager.FindParkingSpace();
+        if (spot != null)
+        {
+            spot.ParkVehicle(vehicle);
+            ticket = new Ticket(vehicle, spot);
+            Console.WriteLine($"Ticket generated for Vehicle {vehicle.VehicleNumber} at Spot {spot.Id}");
+            return ticket;
+        }
+        else
+        {
+            Console.WriteLine("No spot available!");
+            return null;
+        }
+    }
+}
+
+// Exit Gate
+public class ExitGate
+{
+    private ParkingSpotFactory factory = new ParkingSpotFactory();
+    private CostComputational costComputational;
+    private IPaymentStrategy paymentStrategy;
+
+    public double PriceCal(Ticket ticket)
+    {
+        costComputational = new CostComputational(ticket.Vehicle.VType);
+        return costComputational.CalculatePrice(ticket);
+    }
+
+    public void Payment(IPaymentStrategy paymentStrategy)
+    {
+        this.paymentStrategy = paymentStrategy;
+        paymentStrategy.Payment();
+    }
+
+    public void RemoveVehicle(ParkingSpot spot)
+    {
+        spot.RemoveVehicle();
+    }
+}
+
+// Pricing Strategy
+public interface IPricingStrategy
+{
+    double CalculatePrice(Ticket ticket);
+}
+
+public class HourlyPricingStrategy : IPricingStrategy
+{
+    public double CalculatePrice(Ticket ticket)
+    {
+        var hours = (DateTime.Now - ticket.EntryTime).TotalHours;
+        return Math.Ceiling(hours) * ticket.Spot.Price;
+    }
+}
+
+public class MinutePricingStrategy : IPricingStrategy
+{
+    public double CalculatePrice(Ticket ticket)
+    {
+        var minutes = (DateTime.Now - ticket.EntryTime).TotalMinutes;
+        return Math.Ceiling(minutes) * (ticket.Spot.Price / 60);
+    }
+}
+
+// Cost Computational
+public class CostComputational
+{
+    private IPricingStrategy pricingStrategy;
+
+    public CostComputational(VehicleType type)
+    {
+        if (type == VehicleType.Bike)
+        {
+            pricingStrategy = new HourlyPricingStrategy();
+        }
+        else
+        {
+            pricingStrategy = new MinutePricingStrategy();
+        }
+    }
+
+    public double CalculatePrice(Ticket ticket)
+    {
+        return pricingStrategy.CalculatePrice(ticket);
+    }
+}
+
+// Payment Strategies
+public interface IPaymentStrategy
+{
+    void Payment();
+}
+
+public class CashPaymentStrategy : IPaymentStrategy
+{
+    public void Payment()
+    {
+        Console.WriteLine("Payment done by cash.");
+    }
+}
+
+public class CardPaymentStrategy : IPaymentStrategy
+{
+    public void Payment()
+    {
+        Console.WriteLine("Payment done by card.");
+    }
+}
+
+// Program
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        EntranceGate entrance = new EntranceGate();
+        ExitGate exit = new ExitGate();
+
+        Vehicle bike = new Vehicle(123, VehicleType.Bike);
+        Vehicle car = new Vehicle(456, VehicleType.Car);
+
+        // Bike entry
+        Ticket bikeTicket = entrance.BookSpot(bike);
+
+        // Car entry
+        Ticket carTicket = entrance.BookSpot(car);
+
+        // Exiting bike
+        double bikePrice = exit.PriceCal(bikeTicket);
+        Console.WriteLine($"Bike Parking Cost: {bikePrice}");
+        exit.Payment(new CashPaymentStrategy());
+        exit.RemoveVehicle(bikeTicket.Spot);
+
+        // Exiting car
+        double carPrice = exit.PriceCal(carTicket);
+        Console.WriteLine($"Car Parking Cost: {carPrice}");
+        exit.Payment(new CardPaymentStrategy());
+        exit.RemoveVehicle(carTicket.Spot);
+    }
+}
+
