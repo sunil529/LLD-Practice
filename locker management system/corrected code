@@ -1,0 +1,249 @@
+using System;
+using System.Collections.Generic;
+
+namespace LockerManagementSystem
+{
+    public enum Size
+    {
+        Large,
+        Medium,
+        Small
+    }
+
+    public enum Status
+    {
+        InTransit,
+        InLocker,
+        Retrieved
+    }
+
+    public class Package
+    {
+        public int LockerId { get; set; }
+        public Size SizeType { get; set; }
+        public string Name { get; set; }
+        public User User { get; set; }
+    }
+
+    public class Locker
+    {
+        public int Id { get; set; }
+        public Size Size { get; set; }
+        public Package Package { get; set; }
+        public string Otp { get; set; } = "";
+        public bool IsEmpty { get; set; } = true;
+    }
+
+    public interface IFindLockerStrategy
+    {
+        Locker FindLocker(Package package, Locker[,] lockers);
+    }
+
+    public class NearestLockerStrategy : IFindLockerStrategy
+    {
+        public Locker FindLocker(Package package, Locker[,] lockers)
+        {
+            int n = lockers.GetLength(0);
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (package.SizeType <= lockers[i, j].Size && lockers[i, j].IsEmpty)
+                    {
+                        return lockers[i, j];
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    public class LockerManager
+    {
+        private Locker[,] lockers;
+        private IFindLockerStrategy _strategy;
+        private int n;
+
+        public LockerManager(int n, IFindLockerStrategy strategy)
+        {
+            this.n = n;
+            _strategy = strategy;
+            lockers = new Locker[n, n];
+
+            int counter = 1;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Size currentSize;
+                    if (counter <= 33)
+                        currentSize = Size.Small;
+                    else if (counter <= 66)
+                        currentSize = Size.Medium;
+                    else
+                        currentSize = Size.Large;
+
+                    lockers[i, j] = new Locker
+                    {
+                        Id = counter,
+                        Size = currentSize,
+                        Package = null,
+                        Otp = "",
+                        IsEmpty = true
+                    };
+                    counter++;
+                }
+            }
+        }
+
+        public Locker FindLocker(Package package)
+        {
+            return _strategy.FindLocker(package, lockers);
+        }
+
+        public bool AllocateLocker(Locker locker, Package package)
+        {
+            if (locker != null)
+            {
+                locker.Package = package;
+                package.LockerId = locker.Id;
+                locker.IsEmpty = false;
+                return true;
+            }
+            return false;
+        }
+
+        public string GenerateOtp()
+        {
+            return Guid.NewGuid().ToString().Substring(0, 6); // Random 6-character OTP
+        }
+
+        public Locker FindLockerById(int lockerId)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (lockers[i, j].Id == lockerId)
+                        return lockers[i, j];
+                }
+            }
+            return null;
+        }
+    }
+
+    public interface IUser
+    {
+        bool PlaceGoodsInLocker(Package package);
+        bool ReturnGoods(Package package);
+    }
+
+    public class User : IUser
+    {
+        public string Name { get; set; }
+        public string EmailId { get; set; }
+        private Dictionary<Package, string> PackageVsOtp { get; set; } = new Dictionary<Package, string>();
+        private Dictionary<Package, Status> PackageVsStatus { get; set; } = new Dictionary<Package, Status>();
+        private LockerManagementSystem _lockerManagementSystem;
+
+        public User(string name, string emailId, LockerManagementSystem lockerManagementSystem)
+        {
+            Name = name;
+            EmailId = emailId;
+            _lockerManagementSystem = lockerManagementSystem;
+        }
+
+        public bool PlaceGoodsInLocker(Package package)
+        {
+            // Implementation can be added if user can place goods directly
+            return false;
+        }
+
+        public bool ReturnGoods(Package package)
+        {
+            // Implementation for returning
+            return false;
+        }
+
+        public bool Retrieve(Package package)
+        {
+            if (PackageVsOtp.ContainsKey(package) && PackageVsStatus.ContainsKey(package))
+            {
+                var result = _lockerManagementSystem.RetrievePackage(package, PackageVsOtp[package], PackageVsStatus[package]);
+                if (result)
+                {
+                    PackageVsOtp[package] = "";
+                    PackageVsStatus[package] = Status.Retrieved;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void SetOtpAndStatus(Package package, string otp, Status status)
+        {
+            PackageVsOtp[package] = otp;
+            PackageVsStatus[package] = status;
+        }
+    }
+
+    public class DeliveryPerson : IUser
+    {
+        public string Name { get; set; }
+        public string EmailId { get; set; }
+        private LockerManager _lockerManager;
+
+        public DeliveryPerson(string name, string emailId, LockerManager lockerManager)
+        {
+            Name = name;
+            EmailId = emailId;
+            _lockerManager = lockerManager;
+        }
+
+        public bool PlaceGoodsInLocker(Package package)
+        {
+            var locker = _lockerManager.FindLocker(package);
+            var result = _lockerManager.AllocateLocker(locker, package);
+            if (result)
+            {
+                string otp = _lockerManager.GenerateOtp();
+                package.User.SetOtpAndStatus(package, otp, Status.InLocker);
+                locker.Otp = otp;
+                return true;
+            }
+            return false;
+        }
+
+        public bool ReturnGoods(Package package)
+        {
+            // Implementation for returns by delivery person if needed
+            return false;
+        }
+    }
+
+    public class LockerManagementSystem
+    {
+        private LockerManager _lockerManager;
+
+        public LockerManagementSystem(LockerManager lockerManager)
+        {
+            _lockerManager = lockerManager;
+        }
+
+        public bool RetrievePackage(Package package, string otp, Status status)
+        {
+            if (status != Status.Retrieved)
+            {
+                Locker locker = _lockerManager.FindLockerById(package.LockerId);
+                if (locker != null && locker.Otp == otp)
+                {
+                    locker.IsEmpty = true;
+                    locker.Package = null;
+                    locker.Otp = "";
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}

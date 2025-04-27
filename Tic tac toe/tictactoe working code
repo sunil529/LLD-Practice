@@ -192,7 +192,7 @@ public class Game
         }
 
         for (int i = 0, j = 0; i < gameBoard.Size; i++, j++)
-        {
+        { 
             if (gameBoard.GameBoard[i, j] == null || gameBoard.GameBoard[i, j].PieceType != pieceType)
             {
                 diagonalMatch = false;
