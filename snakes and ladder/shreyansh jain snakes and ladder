@@ -1,0 +1,208 @@
+using System;
+using System.Collections.Generic;
+
+public class Dice
+{
+    private int n;
+    private int min = 1;
+    private int max = 6;
+    private Random random;
+
+    public Dice(int n)
+    {
+        this.n = n;
+        random = new Random();
+    }
+
+    public int RollDice()
+    {
+        int totalSum = 0;
+        int diceUsed = 0;
+        while (diceUsed < n)
+        {
+            totalSum += random.Next(min, max + 1); // random.Next(min, max+1) is inclusive of min and exclusive of max+1
+            diceUsed++;
+        }
+        return totalSum;
+    }
+}
+
+public class Player
+{
+    public string Id { get; set; }
+    public int CurrentPosition { get; set; }
+
+    public Player(string id, int currentPosition)
+    {
+        Id = id;
+        CurrentPosition = currentPosition;
+    }
+}
+
+public class Jump
+{
+    public int Start { get; set; }
+    public int End { get; set; }
+
+    public Jump(int start, int end)
+    {
+        Start = start;
+        End = end;
+    }
+}
+
+public class Cell
+{
+    public Jump Jump { get; set; }
+}
+
+public class Board
+{
+    public Cell[,] Cells;
+    private int boardSize;
+    private Random random;
+
+    public Board(int boardSize, int numberOfSnakes, int numberOfLadders)
+    {
+        this.boardSize = boardSize;
+        random = new Random();
+        InitializeBoard(boardSize);
+        AddSnakesAndLadders(numberOfSnakes, numberOfLadders);
+    }
+
+    private void InitializeBoard(int size)
+    {
+        Cells = new Cell[size, size];
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                Cells[i, j] = new Cell();
+            }
+        }
+    }
+
+    private void AddSnakesAndLadders(int numberOfSnakes, int numberOfLadders)
+    {
+        int totalCells = boardSize * boardSize;
+
+        while (numberOfSnakes > 0)
+        {
+            int snakeHead = random.Next(1, totalCells - 1);
+            int snakeTail = random.Next(1, totalCells - 1);
+
+            if (snakeTail >= snakeHead) continue;
+
+            Jump snake = new Jump(snakeHead, snakeTail);
+            GetCell(snakeHead).Jump = snake;
+            numberOfSnakes--;
+        }
+
+        while (numberOfLadders > 0)
+        {
+            int ladderStart = random.Next(1, totalCells - 1);
+            int ladderEnd = random.Next(1, totalCells - 1);
+
+            if (ladderStart >= ladderEnd) continue;
+
+            Jump ladder = new Jump(ladderStart, ladderEnd);
+            GetCell(ladderStart).Jump = ladder;
+            numberOfLadders--;
+        }
+    }
+
+    public Cell GetCell(int playerPosition)
+    {
+        int row = playerPosition / boardSize;
+        int col = playerPosition % boardSize;
+        return Cells[row, col];
+    }
+}
+
+public class Game
+{
+    private Board board;
+    private Dice dice;
+    private LinkedList<Player> playersList;
+    private Player winner;
+    private int boardSize = 10;
+
+    public Game()
+    {
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        board = new Board(boardSize, 5, 4);
+        dice = new Dice(1);
+        winner = null;
+        playersList = new LinkedList<Player>();
+        AddPlayers();
+    }
+
+    private void AddPlayers()
+    {
+        playersList.AddLast(new Player("P1", 0));
+        playersList.AddLast(new Player("P2", 0));
+    }
+
+    public void StartGame()
+    {
+        while (winner == null)
+        {
+            Player playerTurn = FindPlayerTurn();
+            Console.WriteLine($"The turn is for {playerTurn.Id} and it is on {playerTurn.CurrentPosition}");
+
+            int diceValue = dice.RollDice();
+            int newPosition = playerTurn.CurrentPosition + diceValue;
+
+            newPosition = JumpCheck(newPosition);
+
+            playerTurn.CurrentPosition = newPosition;
+            Console.WriteLine($"{playerTurn.Id} moved to {playerTurn.CurrentPosition}");
+
+            if (newPosition >= (boardSize * boardSize) - 1)
+            {
+                winner = playerTurn;
+                Console.WriteLine($"Winner is {winner.Id}!");
+            }
+        }
+    }
+
+    private Player FindPlayerTurn()
+    {
+        Player playerTurn = playersList.First.Value;
+        playersList.RemoveFirst();
+        playersList.AddLast(playerTurn);
+        return playerTurn;
+    }
+
+    private int JumpCheck(int playerNewPosition)
+    {
+        int totalCells = boardSize * boardSize;
+
+        if (playerNewPosition >= totalCells)
+            return playerNewPosition;
+
+        Cell cell = board.GetCell(playerNewPosition);
+
+        if (cell.Jump != null && cell.Jump.Start == playerNewPosition)
+        {
+            string jumpType = (cell.Jump.Start < cell.Jump.End) ? "ladder" : "snake";
+            Console.WriteLine($"Jumped by {jumpType} from {cell.Jump.Start} to {cell.Jump.End}");
+            return cell.Jump.End;
+        }
+
+        return playerNewPosition;
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Game game = new Game();
+        game.StartGame();
+    }
+}
