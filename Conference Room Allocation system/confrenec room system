@@ -1,0 +1,209 @@
+room{
+    roomId
+    rommname,
+    Hashmap<int,booking>hoursvsbooking=null;
+   }
+Booking{
+    List<user>guest;
+    ROom room,
+}
+BookingManager{
+    roomManager roommanager;
+    hashmap<int,booking>bookingidvsbooking=null;
+    hashmap<int,set<int>>hoursvsallbookingId=null;
+    Booking booking;
+    createBooking();
+}
+roommanager{
+    room
+    getavailableroom();
+    fillroom();
+    checkavialbiity();
+   updateBooking();
+}
+
+roomamangemtnsystem{
+room manager
+}
+User{
+}
+
+main()
+{
+    roomainabgemtn room=new roomamangemnt();
+    User user=new User()
+}
+
+
+using System;
+using System.Collections.Generic;
+
+public class Room
+{
+    public int RoomId { get; set; }
+    public string RoomName { get; set; }
+    public Dictionary<int, Booking> HoursVsBooking { get; set; } = new();
+
+    public Room(int id, string name)
+    {
+        RoomId = id;
+        RoomName = name;
+    }
+
+    public bool IsAvailable(int hour)
+    {
+        return !HoursVsBooking.ContainsKey(hour);
+    }
+
+    public void BookHour(int hour, Booking booking)
+    {
+        HoursVsBooking[hour] = booking;
+    }
+}
+
+public class User
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+
+    public User(int id, string name)
+    {
+        UserId = id;
+        Name = name;
+    }
+}
+
+public class Booking
+{
+    public int BookingId { get; set; }
+    public List<User> Guests { get; set; }
+    public Room Room { get; set; }
+    public int Hour { get; set; }
+
+    public Booking(int id, List<User> guests, Room room, int hour)
+    {
+        BookingId = id;
+        Guests = guests;
+        Room = room;
+        Hour = hour;
+    }
+}
+
+public class RoomManager
+{
+    public List<Room> Rooms { get; set; }
+
+    public RoomManager(List<Room> rooms)
+    {
+        Rooms = rooms;
+    }
+
+    public Room? GetAvailableRoom(int hour)
+    {
+        foreach (var room in Rooms)
+        {
+            if (room.IsAvailable(hour))
+                return room;
+        }
+        return null;
+    }
+
+    public bool UpdateBooking(Room room, int hour, Booking booking)
+    {
+        if (room.IsAvailable(hour))
+        {
+            room.BookHour(hour, booking);
+            return true;
+        }
+        return false;
+    }
+}
+
+public class BookingManager
+{
+    private RoomManager _roomManager;
+    private Dictionary<int, Booking> BookingIdVsBooking = new();
+    private Dictionary<int, HashSet<int>> HoursVsAllBookingIds = new();
+    private int _bookingCounter = 1;
+
+    public BookingManager(RoomManager roomManager)
+    {
+        _roomManager = roomManager;
+    }
+
+    public Booking? CreateBooking(List<User> guests, int hour)
+    {
+        Room? availableRoom = _roomManager.GetAvailableRoom(hour);
+
+        if (availableRoom == null)
+        {
+            Console.WriteLine($"No available rooms at hour {hour}");
+            return null;
+        }
+
+        var booking = new Booking(_bookingCounter++, guests, availableRoom, hour);
+        if (_roomManager.UpdateBooking(availableRoom, hour, booking))
+        {
+            BookingIdVsBooking[booking.BookingId] = booking;
+            if (!HoursVsAllBookingIds.ContainsKey(hour))
+                HoursVsAllBookingIds[hour] = new HashSet<int>();
+            HoursVsAllBookingIds[hour].Add(booking.BookingId);
+
+            Console.WriteLine($"Booking successful for room {availableRoom.RoomName} at hour {hour}");
+            return booking;
+        }
+
+        return null;
+    }
+
+    public void ShowAllBookings()
+    {
+        foreach (var kvp in BookingIdVsBooking)
+        {
+            Console.WriteLine($"Booking ID: {kvp.Key}, Room: {kvp.Value.Room.RoomName}, Hour: {kvp.Value.Hour}");
+        }
+    }
+}
+
+public class RoomManagementSystem
+{
+    private RoomManager _roomManager;
+    private BookingManager _bookingManager;
+
+    public RoomManagementSystem()
+    {
+        List<Room> rooms = new()
+        {
+            new Room(1, "Conference Room A"),
+            new Room(2, "Conference Room B"),
+            new Room(3, "Conference Room C")
+        };
+
+        _roomManager = new RoomManager(rooms);
+        _bookingManager = new BookingManager(_roomManager);
+    }
+
+    public void StartDemo()
+    {
+        User user1 = new(1, "Alice");
+        User user2 = new(2, "Bob");
+
+        List<User> group1 = new() { user1, user2 };
+
+        _bookingManager.CreateBooking(group1, 10);
+        _bookingManager.CreateBooking(group1, 10); // next room
+        _bookingManager.CreateBooking(group1, 10); // next room
+        _bookingManager.CreateBooking(group1, 10); // no room should be available
+
+        _bookingManager.ShowAllBookings();
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        RoomManagementSystem system = new();
+        system.StartDemo();
+    }
+}
