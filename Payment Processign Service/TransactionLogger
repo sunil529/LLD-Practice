@@ -1,0 +1,4 @@
+interface ITransactionLogger {
+    void LogSuccess(string paymentId, string bank);
+    void LogFailure(string paymentId, string bank, string error);
+}

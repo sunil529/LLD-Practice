@@ -1,0 +1,6 @@
+class PaymentResponse {
+    string paymentId;
+    PaymentStatus status; // Pending, Authorized, Failed
+    string message;
+    DateTime timestamp;
+}

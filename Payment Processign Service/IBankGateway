@@ -1,0 +1,4 @@
+interface IBankGateway {
+    string Name { get; }
+    PaymentResponse AuthorizePayment(PaymentRequest request);
+}

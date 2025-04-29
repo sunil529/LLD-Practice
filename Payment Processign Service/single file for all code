@@ -1,0 +1,144 @@
+using System;
+using System.Collections.Generic;
+
+// Enums
+public enum PaymentStatus { Pending, Authorized, Failed }
+
+// Payment Request
+public class PaymentRequest {
+    public string PaymentId { get; set; }
+    public string CardNumber { get; set; } // In real systems, tokenized
+    public string CardHolderName { get; set; }
+    public DateTime ExpiryDate { get; set; }
+    public string CVV { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public string MerchantId { get; set; }
+}
+
+// Payment Response
+public class PaymentResponse {
+    public string PaymentId { get; set; }
+    public PaymentStatus Status { get; set; }
+    public string Message { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+    public bool IsSuccess() => Status == PaymentStatus.Authorized;
+}
+
+// Bank Gateway Interface
+public interface IBankGateway {
+    string Name { get; }
+    PaymentResponse AuthorizePayment(PaymentRequest request);
+}
+
+// Sample Bank Gateway Implementations
+public class HDFCGateway : IBankGateway {
+    public string Name => "HDFC";
+
+    public PaymentResponse AuthorizePayment(PaymentRequest request) {
+        if (request.Amount < 10000) {
+            return new PaymentResponse {
+                PaymentId = request.PaymentId,
+                Status = PaymentStatus.Authorized,
+                Message = "Payment Authorized by HDFC"
+            };
+        }
+        throw new Exception("HDFC Declined - Limit Exceeded");
+    }
+}
+
+public class ICICIGateway : IBankGateway {
+    public string Name => "ICICI";
+
+    public PaymentResponse AuthorizePayment(PaymentRequest request) {
+        return new PaymentResponse {
+            PaymentId = request.PaymentId,
+            Status = PaymentStatus.Authorized,
+            Message = "Payment Authorized by ICICI"
+        };
+    }
+}
+
+// Routing Strategy
+public interface IBankRoutingStrategy {
+    List<IBankGateway> GetPreferredOrder(PaymentRequest request);
+}
+
+public class DefaultBankRoutingStrategy : IBankRoutingStrategy {
+    private readonly List<IBankGateway> _gateways;
+    public DefaultBankRoutingStrategy(List<IBankGateway> gateways) {
+        _gateways = gateways;
+    }
+
+    public List<IBankGateway> GetPreferredOrder(PaymentRequest request) => _gateways;
+}
+
+// Logger
+public interface ITransactionLogger {
+    void LogSuccess(string paymentId, string bank);
+    void LogFailure(string paymentId, string bank, string error);
+}
+
+public class ConsoleLogger : ITransactionLogger {
+    public void LogSuccess(string paymentId, string bank) =>
+        Console.WriteLine($"[SUCCESS] Payment {paymentId} succeeded via {bank}");
+
+    public void LogFailure(string paymentId, string bank, string error) =>
+        Console.WriteLine($"[FAILURE] Payment {paymentId} failed via {bank}: {error}");
+}
+
+// Payment Processor
+public class PaymentProcessor {
+    private readonly IBankRoutingStrategy _routingStrategy;
+    private readonly ITransactionLogger _logger;
+
+    public PaymentProcessor(IBankRoutingStrategy routingStrategy, ITransactionLogger logger) {
+        _routingStrategy = routingStrategy;
+        _logger = logger;
+    }
+
+    public PaymentResponse ProcessPayment(PaymentRequest request) {
+        foreach (var bank in _routingStrategy.GetPreferredOrder(request)) {
+            try {
+                var response = bank.AuthorizePayment(request);
+                if (response.IsSuccess()) {
+                    _logger.LogSuccess(request.PaymentId, bank.Name);
+                    return response;
+                }
+            } catch (Exception ex) {
+                _logger.LogFailure(request.PaymentId, bank.Name, ex.Message);
+            }
+        }
+
+        return new PaymentResponse {
+            PaymentId = request.PaymentId,
+            Status = PaymentStatus.Failed,
+            Message = "All bank attempts failed"
+        };
+    }
+}
+
+// Main Runner
+public class Program {
+    public static void Main(string[] args) {
+        var gateways = new List<IBankGateway> { new HDFCGateway(), new ICICIGateway() };
+        var routingStrategy = new DefaultBankRoutingStrategy(gateways);
+        var logger = new ConsoleLogger();
+        var processor = new PaymentProcessor(routingStrategy, logger);
+
+        var paymentRequest = new PaymentRequest {
+            PaymentId = Guid.NewGuid().ToString(),
+            CardNumber = "4111-xxxx-xxxx-1111",
+            CardHolderName = "John Doe",
+            ExpiryDate = new DateTime(2026, 12, 31),
+            CVV = "123",
+            Amount = 5000,
+            Currency = "INR",
+            MerchantId = "M12345"
+        };
+
+        var response = processor.ProcessPayment(paymentRequest);
+        Console.WriteLine($"Final Status: {response.Status}, Message: {response.Message}");
+    }
+}

@@ -1,0 +1,10 @@
+class PaymentRequest {
+    string paymentId;
+    string cardNumber; // Encrypted or tokenized
+    string cardHolderName;
+    DateTime expiryDate;
+    string cvv;
+    decimal amount;
+    string currency;
+    string merchantId;
+}

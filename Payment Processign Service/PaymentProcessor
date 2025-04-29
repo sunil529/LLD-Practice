@@ -1,0 +1,25 @@
+class PaymentProcessor {
+    List<IBankGateway> bankGateways;
+    IBankRoutingStrategy routingStrategy;
+    ITransactionLogger logger;
+
+    PaymentResponse ProcessPayment(PaymentRequest request) {
+        foreach (var bank in routingStrategy.GetPreferredOrder(request)) {
+            try {
+                var response = bank.AuthorizePayment(request);
+                if (response.IsSuccess()) {
+                    logger.LogSuccess(request.paymentId, bank.Name);
+                    return response;
+                }
+            } catch (Exception ex) {
+                logger.LogFailure(request.paymentId, bank.Name, ex.Message);
+                // continue to next bank
+            }
+        }
+        return new PaymentResponse {
+            paymentId = request.paymentId,
+            status = PaymentStatus.Failed,
+            message = "All bank attempts failed"
+        };
+    }
+}

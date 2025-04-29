@@ -1,0 +1,3 @@
+interface IBankRoutingStrategy {
+    List<IBankGateway> GetPreferredOrder(PaymentRequest request);
+}

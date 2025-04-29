@@ -1,0 +1,4 @@
+class IdempotencyManager {
+    bool IsDuplicate(string paymentId);
+    void Record(string paymentId);
+}
