@@ -1,0 +1,44 @@
+using System;
+using System.Collections.Generic;
+
+public class SlidingWindowLogRateLimiter
+{
+    private readonly int maxRequests;
+    private readonly TimeSpan windowSize;
+    private readonly Queue<DateTime> requestTimestamps;
+
+    public SlidingWindowLogRateLimiter(int maxRequests, TimeSpan windowSize)
+    {
+        this.maxRequests = maxRequests;
+        this.windowSize = windowSize;
+        this.requestTimestamps = new Queue<DateTime>();
+    }
+
+    public bool AllowRequest()
+    {
+        DateTime now = DateTime.UtcNow;
+
+        // Remove timestamps older than the window
+        while (requestTimestamps.Count > 0 && (now - requestTimestamps.Peek()) > windowSize)
+        {
+            requestTimestamps.Dequeue();
+        }
+
+        if (requestTimestamps.Count < maxRequests)
+        {
+            requestTimestamps.Enqueue(now);
+            return true; // Allow the request
+        }
+
+        return false; // Rate limit exceeded
+    }
+}
+
+var limiter = new SlidingWindowLogRateLimiter(maxRequests: 5, windowSize: TimeSpan.FromSeconds(10));
+
+for (int i = 0; i < 10; i++)
+{
+    bool allowed = limiter.AllowRequest();
+    Console.WriteLine($"Request {i + 1}: {(allowed ? "Allowed" : "Denied")}");
+    System.Threading.Thread.Sleep(1000); // 1-second delay
+}

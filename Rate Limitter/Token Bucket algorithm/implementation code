@@ -1,0 +1,51 @@
+using System;
+
+public class TokenBucket
+{
+    private readonly int capacity;
+    private readonly double refillRatePerSecond;
+    private double currentTokens;
+    private DateTime lastRefillTime;
+
+    public TokenBucket(int capacity, double refillRatePerSecond)
+    {
+        this.capacity = capacity;
+        this.refillRatePerSecond = refillRatePerSecond;
+        this.currentTokens = capacity;
+        this.lastRefillTime = DateTime.UtcNow;
+    }
+
+    private void Refill()
+    {
+        var now = DateTime.UtcNow;
+        var secondsPassed = (now - lastRefillTime).TotalSeconds;
+        var tokensToAdd = secondsPassed * refillRatePerSecond;
+
+        if (tokensToAdd > 0)
+        {
+            currentTokens = Math.Min(capacity, currentTokens + tokensToAdd);
+            lastRefillTime = now;
+        }
+    }
+
+    public bool AllowRequest()
+    {
+        Refill();
+
+        if (currentTokens >= 1)
+        {
+            currentTokens -= 1;
+            return true; // Allowed
+        }
+
+        return false; // Rate limited
+    }
+}
+var bucket = new TokenBucket(capacity: 5, refillRatePerSecond: 1); // 5 requests max, refills 1 per second
+
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine($"Request {i + 1}: " + (bucket.AllowRequest() ? "Allowed" : "Denied"));
+    System.Threading.Thread.Sleep(300); // simulate delay
+}
+

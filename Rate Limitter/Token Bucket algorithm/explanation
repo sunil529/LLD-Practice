@@ -1,0 +1,31 @@
+What is the Token Bucket Algorithm?
+The Token Bucket algorithm is used for rate limiting – it controls how many requests a user or system can make over time.
+
+or
+
+“The Token Bucket algorithm helps ensure that traffic is spread out over time. It allows for occasional bursts up to the bucket’s capacity but ensures the average rate stays within defined limits. I implemented it in C# for API throttling where each user has their own token bucket to prevent abuse.”
+
+🪣 Analogy
+Imagine a bucket that holds tokens:
+
+Tokens are added to the bucket at a fixed rate (e.g., 1 token per second).
+
+Each request consumes one token.
+
+If there are no tokens left in the bucket, the request is rejected or delayed.
+
+The bucket has a maximum capacity, so it cannot exceed a certain number of tokens.
+
+📦 Key Parameters
+
+Term	Description
+Capacity	Maximum number of tokens bucket can hold
+Refill Rate	How many tokens are added per time unit
+Last Refill	Timestamp of the last refill
+Tokens	Current number of available tokens
+✅ Use Cases
+API rate limiting (per user/IP)
+
+Traffic shaping in networks
+
+Preventing abuse or denial-of-service

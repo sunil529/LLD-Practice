@@ -1,0 +1,35 @@
+public class NavigationManager
+{
+    private Stack<string> backStack = new Stack<string>();
+    private Stack<string> forwardStack = new Stack<string>();
+    private string currentPage;
+
+    public void NavigateTo(string newPage)
+    {
+        if (currentPage != null) backStack.Push(currentPage);
+        currentPage = newPage;
+        forwardStack.Clear();
+    }
+
+    public string GoBack()
+    {
+        if (backStack.Count > 0)
+        {
+            forwardStack.Push(currentPage);
+            currentPage = backStack.Pop();
+        }
+        return currentPage;
+    }
+
+    public string GoForward()
+    {
+        if (forwardStack.Count > 0)
+        {
+            backStack.Push(currentPage);
+            currentPage = forwardStack.Pop();
+        }
+        return currentPage;
+    }
+
+    public string GetCurrentPage() => currentPage;
+}

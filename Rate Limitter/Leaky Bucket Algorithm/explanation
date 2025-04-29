@@ -1,0 +1,29 @@
+The Leaky Bucket algorithm is another rate-limiting technique used to control the output rate of a system. It's especially useful when you want a constant flow of requests regardless of the burstiness of input.
+
+or 
+
+“The Leaky Bucket algorithm enforces a constant outflow rate of requests, smoothing out traffic bursts. I implemented it in C# to prevent API overload. When requests exceed the bucket’s capacity, they’re dropped—ensuring backpressure on clients while maintaining system stability.”
+
+🪣 Analogy
+Imagine water pouring into a bucket:
+
+The bucket leaks at a constant rate.
+
+If water comes in faster than it can leak, the bucket overflows.
+
+Overflow means requests are dropped.
+
+📦 Key Concepts
+
+Term	Description
+Capacity	Max number of requests the bucket can hold
+Leak Rate	Fixed rate (e.g., 1 request per second)
+Queue	Holds incoming requests till they’re leaked
+Current Size	Current water (requests) in the bucket
+✅ Use Cases
+Shaping traffic at a fixed rate
+
+Avoiding sudden bursts of API hits
+
+Network routers, firewall packet shaping
+

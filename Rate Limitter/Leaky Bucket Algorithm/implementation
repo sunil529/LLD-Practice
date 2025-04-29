@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+
+public class LeakyBucket
+{
+    private readonly int capacity;
+    private readonly double leakRatePerSecond;
+    private double currentWaterLevel;
+    private DateTime lastLeakTime;
+
+    public LeakyBucket(int capacity, double leakRatePerSecond)
+    {
+        this.capacity = capacity;
+        this.leakRatePerSecond = leakRatePerSecond;
+        this.currentWaterLevel = 0;
+        this.lastLeakTime = DateTime.UtcNow;
+    }
+
+    private void Leak()
+    {
+        var now = DateTime.UtcNow;
+        var secondsPassed = (now - lastLeakTime).TotalSeconds;
+        var leakedWater = secondsPassed * leakRatePerSecond;
+
+        if (leakedWater > 0)
+        {
+            currentWaterLevel = Math.Max(0, currentWaterLevel - leakedWater);
+            lastLeakTime = now;
+        }
+    }
+
+    public bool AllowRequest()
+    {
+        Leak();
+
+        if (currentWaterLevel < capacity)
+        {
+            currentWaterLevel += 1;
+            return true; // Request accepted
+        }
+
+        return false; // Bucket is full, request denied
+    }
+}
+var bucket = new LeakyBucket(capacity: 5, leakRatePerSecond: 1); // leaks 1 request/sec
+
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine($"Request {i + 1}: " + (bucket.AllowRequest() ? "Allowed" : "Denied"));
+    System.Threading.Thread.Sleep(300); // simulate 300ms between requests
+}

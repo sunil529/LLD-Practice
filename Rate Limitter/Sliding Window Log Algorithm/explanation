@@ -1,0 +1,30 @@
+The Sliding Window Log is a rate-limiting algorithm that keeps track of timestamps of individual requests and allows only a certain number of them in a rolling time window.
+
+This approach gives more precise control over traffic than Fixed Window, avoiding burst problems at the edge of the window.
+
+
+or 
+
+"I used the Sliding Window Log algorithm for precise rate limiting by storing timestamps of incoming requests and purging those that fall outside the configured time window. This allowed me to throttle traffic fairly, avoiding bursts and ensuring a consistent experience across users."
+
+📦 Key Concepts
+
+Term	Description
+Window Size	The time interval to look back (e.g., 1 minute)
+Request Log	A list/queue of timestamps of recent requests
+Limit	Max allowed requests within the time window
+✅ Use Case
+Ideal for API rate limiting where fairness and precision are critical.
+
+Used in payment gateways, authentication systems, or any critical service with strict load thresholds.
+
+🧠 Pros and Cons
+✅ Pros:
+Prevents traffic bursts
+
+Precise rate limiting
+
+❌ Cons:
+Requires storing timestamps (memory overhead)
+
+May be inefficient under very high load

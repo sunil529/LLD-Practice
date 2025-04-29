@@ -1,0 +1,45 @@
+using System;
+
+public class FixedWindowRateLimiter
+{
+    private readonly int requestLimit;
+    private readonly TimeSpan windowSize;
+    private int requestCount;
+    private DateTime windowStartTime;
+
+    public FixedWindowRateLimiter(int requestLimit, TimeSpan windowSize)
+    {
+        this.requestLimit = requestLimit;
+        this.windowSize = windowSize;
+        this.windowStartTime = DateTime.UtcNow;
+        this.requestCount = 0;
+    }
+
+    public bool AllowRequest()
+    {
+        var now = DateTime.UtcNow;
+
+        if (now - windowStartTime >= windowSize)
+        {
+            // Reset the window
+            windowStartTime = now;
+            requestCount = 0;
+        }
+
+        if (requestCount < requestLimit)
+        {
+            requestCount++;
+            return true; // Allow request
+        }
+
+        return false; // Deny request
+    }
+}
+var limiter = new FixedWindowRateLimiter(requestLimit: 5, windowSize: TimeSpan.FromSeconds(10));
+
+for (int i = 0; i < 10; i++)
+{
+    bool allowed = limiter.AllowRequest();
+    Console.WriteLine($"Request {i + 1}: {(allowed ? "Allowed" : "Denied")}");
+    System.Threading.Thread.Sleep(1000); // 1-second interval between requests
+}

@@ -1,0 +1,33 @@
+The Sliding Window Counter is a rate-limiting algorithm that approximates the precision of Sliding Window Log but with lower memory usage and better performance. It blends two adjacent fixed windows to smooth out sudden traffic spikes at window boundaries.
+
+🔧 How it Works:
+Instead of tracking every request timestamp, we:
+
+Maintain counters for the current and previous fixed windows.
+
+Calculate a weighted sum of the counts based on how far into the current window we are.
+
+This gives a smooth, more accurate request rate without storing individual request timestamps.
+
+
+
+or 
+
+
+Sliding Window Counter is a hybrid between fixed window and sliding log algorithms. I used it for rate limiting in a high-throughput API environment. It balances precision and efficiency by calculating the estimated request count using the previous and current windows with weighted contribution, avoiding timestamp storage overhead while preventing burst issues."
+
+
+📦 Key Concepts
+
+Term	Description
+Window Size	The fixed length of time (e.g., 1 minute)
+Current Window	The time range we're currently in
+Previous Window	The one before the current
+Offset	Time elapsed in the current window (used for interpolation)
+✅ Use Case
+API gateways
+
+Microservices handling large-scale user traffic
+
+Environments needing low-latency + fairness
+

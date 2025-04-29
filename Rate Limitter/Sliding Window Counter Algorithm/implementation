@@ -1,0 +1,55 @@
+using System;
+
+public class SlidingWindowCounter
+{
+    private readonly int limit;
+    private readonly TimeSpan windowSize;
+
+    private DateTime lastWindowStart;
+    private int currentWindowCount;
+    private int previousWindowCount;
+
+    public SlidingWindowCounter(int limit, TimeSpan windowSize)
+    {
+        this.limit = limit;
+        this.windowSize = windowSize;
+        this.lastWindowStart = DateTime.UtcNow;
+        this.currentWindowCount = 0;
+        this.previousWindowCount = 0;
+    }
+
+    public bool AllowRequest()
+    {
+        DateTime now = DateTime.UtcNow;
+        double windowMilliseconds = windowSize.TotalMilliseconds;
+        double elapsed = (now - lastWindowStart).TotalMilliseconds;
+
+        if (elapsed > windowMilliseconds)
+        {
+            // Shift window
+            int skippedWindows = (int)(elapsed / windowMilliseconds);
+            previousWindowCount = skippedWindows == 1 ? currentWindowCount : 0;
+            currentWindowCount = 0;
+            lastWindowStart = now.AddMilliseconds(-elapsed % windowMilliseconds);
+        }
+
+        double weight = (windowMilliseconds - elapsed) / windowMilliseconds;
+        double estimatedCount = (previousWindowCount * weight) + currentWindowCount;
+
+        if (estimatedCount < limit)
+        {
+            currentWindowCount++;
+            return true; // Allow
+        }
+
+        return false; // Deny
+    }
+}
+var limiter = new SlidingWindowCounter(limit: 10, windowSize: TimeSpan.FromSeconds(5));
+
+for (int i = 0; i < 20; i++)
+{
+    bool allowed = limiter.AllowRequest();
+    Console.WriteLine($"Request {i + 1}: {(allowed ? "Allowed" : "Rate Limited")}");
+    System.Threading.Thread.Sleep(300); // simulate requests
+}

@@ -1,0 +1,30 @@
+The Fixed Window Counter algorithm limits the number of requests a user/client can make within a fixed time window (e.g., 100 requests per minute). Once the counter exceeds the limit, all further requests in that window are rejected.
+
+or
+
+"The Fixed Window Counter algorithm limits the number of allowed requests in a fixed interval (e.g., 5 requests per 10 seconds). I implemented it to throttle API calls per client to avoid server overload. The logic is simple: reset the counter after the window elapses and deny requests once the limit is hit."
+
+📦 Key Concepts
+
+Term	Description
+Window Size	Duration of the time window (e.g., 1 minute)
+Limit	Max allowed requests per window
+Counter	Number of requests seen in the current window
+Reset Time	Time when the window resets
+✅ Use Case
+Prevent brute-force login attempts
+
+API rate limiting (e.g., 60 requests/minute)
+
+Easy to implement and understand
+
+🧠 Pros and Cons
+✅ Pros:
+Easy to implement
+
+Efficient in low-volume scenarios
+
+❌ Cons:
+Traffic spikes at the edges (beginning of each window)
+
+All users can hit the limit again right after reset
